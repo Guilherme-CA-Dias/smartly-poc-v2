@@ -5,6 +5,7 @@ export const getAuthHeaders = () => {
   return {
     'x-auth-id': auth.customerId,
     'x-customer-name': auth.customerName || '',
+    'x-credentials': JSON.stringify(auth.credentials ?? {}),
   };
 };
 

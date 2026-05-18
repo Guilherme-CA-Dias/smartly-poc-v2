@@ -1,13 +1,15 @@
 "use client"
 
 import { IntegrationAppProvider } from "@integration-app/react"
-import { getAuthHeaders } from "./auth-provider"
+import { getAuthHeaders, useAuth } from "./auth-provider"
 
 export function IntegrationProvider({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const { credentials } = useAuth()
+
   const fetchToken = async () => {
     const response = await fetch("/api/integration-token", {
       headers: getAuthHeaders(),
@@ -20,7 +22,7 @@ export function IntegrationProvider({
   }
 
   return (
-    <IntegrationAppProvider fetchToken={fetchToken}>
+    <IntegrationAppProvider fetchToken={fetchToken} credentials={credentials}>
       {children}
     </IntegrationAppProvider>
   )

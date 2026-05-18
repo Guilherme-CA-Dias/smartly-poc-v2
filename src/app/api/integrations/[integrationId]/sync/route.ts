@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/server-auth";
-import { inngest } from "@/inngest/client";
 import { generateCustomerAccessToken } from "@/lib/integration-token";
 import connectDB from "@/lib/mongodb";
 import { SyncModel, SyncStatus } from "@/models/sync";
 import { SyncEventData, SyncRequestBody, SyncRouteResponse } from "./types";
-import { SYNC_EVENT_NAME } from "./syncDocuments";
+import { syncDocuments } from "./syncDocuments";
 import { DocumentModel } from "@/models/document";
 
 export async function POST(
@@ -42,14 +41,12 @@ export async function POST(
       connectionId,
       token,
       userId: auth.customerId,
+      credentials: auth.credentials,
       documentIds,
       syncId: sync._id.toString(),
     } satisfies SyncEventData;
 
-    await inngest.send<{ name: string; data: SyncEventData }>({
-      name: SYNC_EVENT_NAME,
-      data: eventData,
-    });
+    syncDocuments(eventData).catch(console.error);
 
     return NextResponse.json({ status: SyncStatus.in_progress });
   } catch (error) {

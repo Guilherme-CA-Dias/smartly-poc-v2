@@ -1,19 +1,23 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import type { AuthCustomer } from "@/lib/auth"
+import type { AuthCustomer, AuthCredentials } from "@/lib/auth"
 import { ensureAuth, storeAuth } from "@/lib/auth"
 
 interface AuthContextType {
   customerId: string | null
   customerName: string | null
+  credentials: AuthCredentials
   setCustomerName: (name: string) => void
+  setCredentials: (credentials: AuthCredentials) => void
 }
 
 export const AuthContext = createContext<AuthContextType>({
   customerId: null,
   customerName: null,
+  credentials: {},
   setCustomerName: () => {},
+  setCredentials: () => {},
 })
 
 export function useAuth() {
@@ -24,7 +28,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [auth, setAuth] = useState<AuthCustomer | null>(null)
 
   useEffect(() => {
-    // Ensure we have auth on mount
     const currentAuth = ensureAuth()
     setAuth(currentAuth)
   }, [])
@@ -36,12 +39,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAuth(newAuth)
   }
 
+  const setCredentials = (credentials: AuthCredentials) => {
+    if (!auth) return
+    const newAuth = { ...auth, credentials }
+    storeAuth(newAuth)
+    setAuth(newAuth)
+  }
+
   return (
     <AuthContext.Provider
       value={{
         customerId: auth?.customerId ?? null,
         customerName: auth?.customerName ?? null,
+        credentials: auth?.credentials ?? {},
         setCustomerName,
+        setCredentials,
       }}
     >
       {children}
@@ -55,5 +67,6 @@ export function getAuthHeaders(): HeadersInit {
   return {
     "x-auth-id": auth.customerId,
     "x-customer-name": auth.customerName || "",
+    "x-credentials": JSON.stringify(auth.credentials ?? {}),
   }
 }

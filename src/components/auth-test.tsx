@@ -5,13 +5,28 @@ import { useAuth } from "@/app/auth-provider";
 import Link from "next/link";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import type { AuthCredentials } from "@/lib/auth";
+
+const CREDENTIAL_FIELDS: { key: keyof AuthCredentials; label: string; secret?: boolean }[] = [
+  { key: "AWS_ACCESS_KEY_ID", label: "AWS Access Key ID" },
+  { key: "AWS_SECRET_ACCESS_KEY", label: "AWS Secret Access Key", secret: true },
+  { key: "AWS_REGION", label: "AWS Region" },
+  { key: "ENDPOINT_URL", label: "Endpoint URL" },
+  { key: "LIBRARY_ID", label: "Library ID" },
+];
 
 export function AuthTest() {
-  const { customerId, customerName, setCustomerName } = useAuth();
+  const { customerId, customerName, credentials, setCustomerName, setCredentials } = useAuth();
   const [nameInput, setNameInput] = useState("");
+  const [credInputs, setCredInputs] = useState<AuthCredentials>({});
+
+  const handleSaveCredentials = () => {
+    setCredentials({ ...credentials, ...credInputs });
+    setCredInputs({});
+  };
 
   return (
-    <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-4">
+    <div className="p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-6">
       <div>
         <h2 className="text-lg font-semibold mb-2">Test Customer</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 italic mb-4">
@@ -48,6 +63,28 @@ export function AuthTest() {
           }}
         >
           Update Name
+        </Button>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Credentials</h2>
+        <div className="space-y-2 max-w-md">
+          {CREDENTIAL_FIELDS.map(({ key, label, secret }) => (
+            <div key={key} className="flex flex-col gap-1">
+              <label className="text-sm text-gray-600 dark:text-gray-400">{label}</label>
+              <Input
+                type={secret ? "password" : "text"}
+                value={credInputs[key] ?? credentials[key] ?? ""}
+                onChange={(e) =>
+                  setCredInputs((prev) => ({ ...prev, [key]: e.target.value }))
+                }
+                placeholder={`Enter ${label}`}
+              />
+            </div>
+          ))}
+        </div>
+        <Button className="mt-3" onClick={handleSaveCredentials}>
+          Save Credentials
         </Button>
       </div>
     </div>

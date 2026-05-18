@@ -4,8 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'static.integration.app',
-        pathname: '/connectors/**',
+        hostname: '**',
       },
     ],
   },

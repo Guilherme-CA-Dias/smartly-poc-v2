@@ -22,6 +22,7 @@ export async function getIntegrationClient(
     // We create a new instance each time to ensure we're using a fresh token
     const client = new IntegrationAppClient({
       token,
+      credentials: auth.credentials,
     });
 
     return client;

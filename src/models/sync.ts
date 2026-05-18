@@ -19,6 +19,7 @@ export interface Sync {
   syncCompletedAt?: Date;
   syncError?: string;
   isTruncated?: boolean;
+  retryCount?: number;
   documentIds?: string[]; // Initially selected document IDs
   actualSyncedDocumentIds?: string[]; // All document IDs that were actually synced
   createdAt: Date;
@@ -54,6 +55,10 @@ const syncSchema = new Schema<Sync>(
     isTruncated: {
       type: Boolean,
       default: false,
+    },
+    retryCount: {
+      type: Number,
+      default: 0,
     },
     documentIds: [String], // Initially selected document IDs
     actualSyncedDocumentIds: [String], // All document IDs that were actually synced

@@ -1,0 +1,112 @@
+key: bynder
+name: Bynder
+categories: []
+makeApiClient:
+  type: mapping
+  mapping:
+    args:
+      baseUri:
+        $concat:
+          - https://
+          - $var: credentials.subdomain
+          - .bynder.com
+      headers:
+        Authorization:
+          $concat:
+            - 'Bearer '
+            - $var: credentials.access_token
+test:
+  type: javascript
+  code: |
+    import { BadRequestError } from "@integration-app/sdk"
+
+    export default async function test({ apiClient }) {
+      const user = await apiClient.get("/api/v4/currentUser/")
+      if (!user?.id) {
+        throw new BadRequestError("Test failed: could not retrieve current user")
+      }
+      return true
+    }
+options:
+  oauth:
+    type: oauth2
+    inputSchema:
+      description: Enter the subdomain you use to access Bynder.
+      type: object
+      properties:
+        subdomain:
+          title: Subdomain
+          description: Enter your Bynder subdomain (e.g. `acme` for `acme.bynder.com`)
+          type: string
+      required:
+        - subdomain
+    parametersSchema:
+      description: >-
+        Create an OAuth2 app in your Bynder portal under **Settings > OAuth
+        apps**. See [Bynder OAuth2
+        docs](https://support.bynder.com/hc/en-us/articles/360013875180-How-To-Create-And-Manage-OAuth2-Apps).
+      type: object
+      properties:
+        clientId:
+          title: Client ID
+          description: The unique identifier of your Bynder OAuth2 app
+          type: string
+        clientSecret:
+          title: Client Secret
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - offline
+              - current.user:read
+              - asset:read
+              - asset:write
+              - asset.usage:read
+              - asset.usage:write
+              - collection:read
+              - collection:write
+              - meta.assetbank:read
+              - meta.assetbank:write
+              - meta.workflow:read
+              - meta.workflow:write
+            allowCustom: true
+          default:
+            - offline
+            - current.user:read
+            - asset:read
+            - asset:write
+            - collection:read
+            - meta.assetbank:read
+      required:
+        - clientId
+        - clientSecret
+    getOAuthConfig:
+      type: javascript
+      code: |
+        export default async function getOAuthConfig({
+          connectorParameters: { clientId, clientSecret, scopes },
+          connectionParameters: { subdomain },
+        }) {
+          return {
+            clientId,
+            clientSecret,
+            authorizeUri: `https://${subdomain}.bynder.com/v6/authentication/oauth2/auth`,
+            tokenUri: `https://${subdomain}.bynder.com/v6/authentication/oauth2/token`,
+            scopes: scopes ?? ["offline", "current.user:read", "asset:read", "asset:write", "collection:read", "meta.assetbank:read"],
+          }
+        }
+    ui:
+      schema:
+        type: object
+        properties:
+          subdomain:
+            title: Subdomain
+            description: Enter your Bynder subdomain (e.g. `acme` for `acme.bynder.com`)
+            type: string
+        required:
+          - subdomain
+    title: OAuth 2.0
+uuid: 850036d1-d58c-44ef-83c7-b5b3f3daab42
+externalAppUuid: 1f094dfd-a2dc-4cbb-89e9-cafb2298fcc3

@@ -1,0 +1,80 @@
+uuid: c8a21726-a46d-4a16-8267-4642baa9b824
+key: download-content-item
+name: Download Content Item
+isCustomized: false
+nodes:
+  api-trigger:
+    type: api-trigger
+    name: API Trigger
+    config:
+      inputSchema:
+        type: object
+        properties:
+          documentId:
+            type: string
+    inputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+    outputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+      title: API Trigger
+    links:
+      - key: download-file-or-markdown
+    dependencies: []
+  api-request-to-your-app:
+    type: api-request-to-your-app
+    name: API Request to Your App
+    config:
+      request:
+        uri: /api/webhooks/on-download-complete
+        method: POST
+        body:
+          documentId:
+            $var: $.input.api-trigger.documentId
+          text:
+            $var: $.input.download-file-or-markdown.content
+          connectionId:
+            $var: $.connection.id
+          downloadURI:
+            $var: $.input.download-file-or-markdown.downloadURI
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: API Request to Your App
+    links: []
+    dependencies: []
+  download-file-or-markdown:
+    type: run-action
+    name: Download file or markdown
+    config:
+      action:
+        key: download-content-item
+      input:
+        id:
+          $var: $.input.api-trigger.documentId
+    outputSchema:
+      type: object
+      properties:
+        downloadURI:
+          type: string
+        content:
+          type: string
+      title: Download file or markdown
+    links:
+      - key: api-request-to-your-app
+    dependencies: []
+autoCreateInstances: true
+parentUuid: 7e4bebe8-e831-45bc-a391-d86f04b802c0
+integrationUuid: aa466028-08f9-4868-921d-21b3716cb69f
+externalAppUuid: 3c4f26e0-7536-456e-8d71-ee38ec718768

@@ -1,0 +1,362 @@
+uuid: c655083c-a0d3-47e0-922f-fc1415ef294c
+key: receive-content-item-events
+name: Receive Content Item Events
+isCustomized: false
+nodes:
+  find-record-by-id:
+    type: find-data-record-by-id
+    name: Find record-by-id
+    config:
+      dataSource:
+        key: content-items
+      id:
+        $var: $.input.content-item-created-trigger.record.id
+      fieldMapping:
+        key: content-items
+    outputSchema:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        uri:
+          type: string
+          format: url
+        createdTime:
+          type: string
+          format: datetime
+        updatedTime:
+          type: string
+          format: datetime
+        deletedTime:
+          type: string
+          format: datetime
+        createdById:
+          type: string
+        updatedById:
+          type: string
+        fields:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id
+            title:
+              type: string
+              title: Title
+            createdAt:
+              type: string
+              title: Created At
+            updatedAt:
+              type: string
+              title: Updated At
+            parentId:
+              type: string
+              title: Parent Id
+            canHaveChildren:
+              type: boolean
+              title: Can Have Children
+            resourceURI:
+              type: string
+              title: Resource Uri
+            canDownload:
+              type: boolean
+              title: Can Download
+      title: Find record-by-id
+    links:
+      - key: send-created-event-to-my-app
+    dependencies: []
+  find-data-record-by-id:
+    type: find-data-record-by-id
+    name: Find Data Record By Id
+    config:
+      dataSource:
+        key: content-items
+      id:
+        $var: $.input.content-item-updated-trigger.record.id
+      fieldMapping:
+        key: content-items
+    outputSchema:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        uri:
+          type: string
+          format: url
+        createdTime:
+          type: string
+          format: datetime
+        updatedTime:
+          type: string
+          format: datetime
+        deletedTime:
+          type: string
+          format: datetime
+        createdById:
+          type: string
+        updatedById:
+          type: string
+        fields:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id
+            title:
+              type: string
+              title: Title
+            createdAt:
+              type: string
+              title: Created At
+            updatedAt:
+              type: string
+              title: Updated At
+            parentId:
+              type: string
+              title: Parent Id
+            canHaveChildren:
+              type: boolean
+              title: Can Have Children
+            resourceURI:
+              type: string
+              title: Resource Uri
+            canDownload:
+              type: boolean
+              title: Can Download
+      title: Find Data Record By Id
+    links:
+      - key: send-updated-request-to-your-app
+    dependencies: []
+  send-created-event-to-my-app:
+    type: api-request-to-your-app
+    name: Send created Event to My App
+    config:
+      request:
+        uri: /api/webhooks/on-create
+        method: POST
+        body:
+          fields:
+            $var: $.input.find-record-by-id.fields
+          connectionId:
+            $var: $.connection.id
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send created Event to My App
+    links: []
+    dependencies: []
+  send-deleted-event-to-my-app:
+    type: api-request-to-your-app
+    name: Send deleted event to My App
+    config:
+      request:
+        method: POST
+        body:
+          id:
+            $var: $.input.content-item-deleted-trigger.record.id
+        uri: /api/webhooks/on-delete
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send deleted event to My App
+    links: []
+    dependencies: []
+  send-updated-request-to-your-app:
+    type: api-request-to-your-app
+    name: Send Updated request to your app
+    config:
+      request:
+        uri: /api/webhooks/on-update
+        method: POST
+        body:
+          connectionId:
+            $var: $.connection.id
+          fields:
+            $var: $.input.find-data-record-by-id.fields
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send Updated request to your app
+    links: []
+    dependencies: []
+  content-item-created-trigger:
+    type: data-record-created-trigger
+    name: Content Item Created Trigger
+    config:
+      dataSource:
+        key: content-items
+      fieldMapping:
+        key: content-items
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            uri:
+              type: string
+              format: url
+            createdTime:
+              type: string
+              format: datetime
+            updatedTime:
+              type: string
+              format: datetime
+            deletedTime:
+              type: string
+              format: datetime
+            createdById:
+              type: string
+            updatedById:
+              type: string
+            fields:
+              type: object
+              properties:
+                id:
+                  type: string
+                  title: Id
+                title:
+                  type: string
+                  title: Title
+                createdAt:
+                  type: string
+                  title: Created At
+                updatedAt:
+                  type: string
+                  title: Updated At
+                parentId:
+                  type: string
+                  title: Parent Id
+                canHaveChildren:
+                  type: boolean
+                  title: Can Have Children
+                resourceURI:
+                  type: string
+                  title: Resource Uri
+                canDownload:
+                  type: boolean
+                  title: Can Download
+      title: Content Item Created Trigger
+    links:
+      - key: find-record-by-id
+    dependencies: []
+  content-item-deleted-trigger:
+    type: data-record-deleted-trigger
+    name: Content Item Deleted Trigger
+    config:
+      dataSource:
+        key: content-items
+      fieldMapping: {}
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+      title: Content Item Deleted Trigger
+    links:
+      - key: send-deleted-event-to-my-app
+    dependencies: []
+  content-item-updated-trigger:
+    type: data-record-updated-trigger
+    name: Content Item Updated Trigger
+    config:
+      dataSource:
+        key: content-items
+      fieldMapping:
+        key: content-items
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            uri:
+              type: string
+              format: url
+            createdTime:
+              type: string
+              format: datetime
+            updatedTime:
+              type: string
+              format: datetime
+            deletedTime:
+              type: string
+              format: datetime
+            createdById:
+              type: string
+            updatedById:
+              type: string
+            fields:
+              type: object
+              properties:
+                id:
+                  type: string
+                  title: Id
+                title:
+                  type: string
+                  title: Title
+                createdAt:
+                  type: string
+                  title: Created At
+                updatedAt:
+                  type: string
+                  title: Updated At
+                parentId:
+                  type: string
+                  title: Parent Id
+                canHaveChildren:
+                  type: boolean
+                  title: Can Have Children
+                resourceURI:
+                  type: string
+                  title: Resource Uri
+                canDownload:
+                  type: boolean
+                  title: Can Download
+      title: Content Item Updated Trigger
+    links:
+      - key: find-data-record-by-id
+    dependencies: []
+autoCreateInstances: true
+parentUuid: 512afd4e-d89e-481a-be72-c71ac29c332b
+integrationUuid: b8b1416e-503a-4508-9b61-09ba0e2e3710
+externalAppUuid: 4c0225c4-1afa-4e52-89dc-fa1b6bd75dcc

@@ -1,16 +1,8 @@
-id: 67e3ec7ba77e96adf25396b3
-name: Content Items
 uuid: 5ad5b3b4-6108-4b8c-9185-753e992a27c6
 key: content-items
-revision: a9dc8a2b-d550-49af-9320-14882a17a4f1
-createdAt: '2025-03-26T12:00:59.310Z'
-updatedAt: '2025-03-26T14:02:18.158Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67b61532220905ae47e23698
-universalFieldMappingId: 67e3ec616446443b8d435553
+name: Content Items
+isCustomized: true
 dataSourceKey: content-items
-dataSourceId: 67e3ec6417681d248899a0b5
 appSchema:
   type: object
   properties:
@@ -75,30 +67,6 @@ importValue:
           to: true
         - from: folder
           to: false
-isCustomized: true
-universalFieldMappingRevision: 1a9d9c11-2de6-4bf2-8734-42b549303de7
-integration:
-  id: 67b61532220905ae47e23698
-  name: Box
-  uuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf
-  key: box
-  state: READY
-  errors: []
-  revision: 5b2d7e44-4999-417f-aba0-a37188130cce
-  createdAt: '2025-02-19T17:30:26.819Z'
-  updatedAt: '2025-10-16T15:00:31.870Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/box/logo.png
-  connectorId: 6466783c60f981f3ce6968ef
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 264
-  hasData: true
-  dataCollectionsCount: 6
-  hasEvents: true
-  eventsCount: 1
-  hasGlobalWebhooks: true
-  hasUdm: true
-  authType: oauth2
+parentUuid: 7b611865-b3ca-4ff9-8fd6-54523fceb729
+integrationUuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf
+dataSourceUuid: 8dbd9eb8-604f-4cf4-a885-8aa41caecc79

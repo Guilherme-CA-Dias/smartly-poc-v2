@@ -1,0 +1,192 @@
+key: dropbox
+name: Dropbox
+logoUri: https://static.integration.app/connectors/dropbox/logo.png
+categories:
+  - File Storage
+  - Document Management
+makeApiClient:
+  type: javascript
+  code: |
+    import { RestApiClient } from '@integration-app/connector-sdk'
+
+    export default async function makeAPIClient({ credentials }) {
+      return new RestApiClient({
+        baseUri: 'https://api.dropboxapi.com/2/',
+        headers: {
+          Authorization: `Bearer ${credentials.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        dynamicOptions: ({ path }) => {
+          if (credentials.teamMemberId && !path.includes('/team/')) {
+            return {
+              headers: {
+                'Dropbox-API-Select-User': credentials.teamMemberId,
+              },
+            }
+          }
+        },
+      })
+    }
+test:
+  type: javascript
+  code: |
+    import { BadRequestError } from '@integration-app/sdk'
+
+    export default async function test({ apiClient }) {
+      const response = await apiClient.post('/check/user', {
+        query: 'foo',
+      })
+      if (response?.result !== 'foo') {
+        throw new BadRequestError(
+          'Connection test failed: response.result is ' + response?.result,
+        )
+      }
+      return true
+    }
+options:
+  auth-proxy:
+    type: proxy
+    proxyKey: dropbox
+    title: Connect via Membrane
+  oauth:
+    type: oauth2
+    customCredentialsSchema:
+      type: object
+      properties:
+        access_token:
+          title: Access Token
+          description: Access token to use for API calls
+          type: string
+        refresh_token:
+          title: Refresh Token
+          description: Refresh token to use for API calls
+          type: string
+        rootNameSpaceId:
+          title: Root Name Space Id
+          description: Root Name Space Id to use for API calls
+          type: string
+        teamMemberId:
+          type: string
+    parametersSchema:
+      description: >-
+        Create an app in the [Dropbox App
+        Console](https://www.dropbox.com/developers/apps) to obtain your app key
+        and secret.
+      type: object
+      properties:
+        clientId:
+          title: Client ID
+          description: The app key from your Dropbox app settings
+          type: string
+        clientSecret:
+          title: Client Secret
+          description: The app secret from your Dropbox app settings
+          type: string
+        scopes:
+          title: Scopes
+          description: OAuth scopes for Dropbox API access
+          type: array
+          items:
+            type: string
+            enum:
+              - account_info.read
+              - account_info.write
+              - files.content.read
+              - files.content.write
+              - files.metadata.read
+              - files.metadata.write
+              - sharing.read
+              - sharing.write
+              - file_requests.read
+              - file_requests.write
+              - contacts.read
+              - contacts.write
+            allowCustom: true
+          default:
+            - account_info.read
+            - files.content.read
+            - files.content.write
+            - files.metadata.read
+            - files.metadata.write
+            - sharing.read
+            - sharing.write
+      required:
+        - clientId
+        - clientSecret
+    getOAuthConfig:
+      type: mapping
+      mapping:
+        clientId:
+          $var: $.connectorParameters.clientId
+        clientSecret:
+          $var: $.connectorParameters.clientSecret
+        scopes:
+          $var: $.connectorParameters.scopes
+        authorizeUri: https://www.dropbox.com/oauth2/authorize
+        tokenUri: https://api.dropbox.com/oauth2/token
+        clientAuthLocation: headers
+        skipPkce: true
+        extra:
+          token_access_type: offline
+    getCredentialsFromAccessTokenResponse:
+      type: javascript
+      code: >
+        import axios from 'axios'
+
+
+        export default async function getCredentialsFromTokenRes({ tokenResponse
+        }) {
+          let teamMemberId = null
+          let userAccountRes
+
+          const dropboxPost = (url, extraHeaders = {}) =>
+            axios({
+              method: 'post',
+              url,
+              data: null,
+              headers: {
+                Authorization: `Bearer ${tokenResponse.access_token}`,
+                'Content-Type': 'application/json',
+                ...extraHeaders,
+              },
+              transformRequest: [() => 'null'],
+            })
+
+          try {
+            userAccountRes = await dropboxPost(
+              'https://api.dropboxapi.com/2/users/get_current_account',
+            )
+          } catch (error) {
+            const errorData = error.response?.data
+            const isTeamTokenError =
+              error.response?.status === 400 &&
+              errorData &&
+              (typeof errorData === 'string'
+                ? errorData.includes('Dropbox Business team')
+                : JSON.stringify(errorData).includes('Dropbox Business team'))
+
+            if (isTeamTokenError) {
+              const adminResponse = await dropboxPost(
+                'https://api.dropboxapi.com/2/team/token/get_authenticated_admin',
+              )
+
+              teamMemberId = adminResponse.data.admin_profile.team_member_id
+
+              userAccountRes = await dropboxPost(
+                'https://api.dropboxapi.com/2/users/get_current_account',
+                { 'Dropbox-API-Select-User': teamMemberId },
+              )
+            } else {
+              throw error
+            }
+          }
+
+          return {
+            ...tokenResponse,
+            rootNameSpaceId: userAccountRes?.data?.root_info?.root_namespace_id,
+            teamMemberId,
+          }
+        }
+    title: OAuth 2.0
+uuid: 0e10584b-749d-4828-90a7-ac271ec1079d
+externalAppUuid: 8fefbe47-1ebc-4208-abb1-2498f4bf573b

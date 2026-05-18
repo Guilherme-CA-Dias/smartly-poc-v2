@@ -1,16 +1,7 @@
-id: 67e3ec70ae8ab0b6187389b3
-name: Download Content Item
-uuid: da054c5a-54cf-4e78-b52a-88847492c3b8
+uuid: 5a4b873f-9479-49b9-853a-c5409f5c9756
 key: download-content-item
-state: READY
-errors: []
-revision: bb0f412c-2792-4f14-9b2c-f0ec9c313fd9
-createdAt: '2025-03-26T12:00:48.371Z'
-updatedAt: '2025-10-12T20:34:27.698Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67b61532220905ae47e23698
-parentId: 67e3ec5d124af3a6b1469421
+name: Download Content Item
+isCustomized: true
 inputSchema:
   type: object
   properties:
@@ -27,41 +18,5 @@ config:
 outputMapping:
   downloadURI:
     $var: $.output.downloadUri
-isCustomized: true
-outputSchema:
-  type: object
-  properties:
-    downloadURI:
-      type: string
-defaultOutputSchema:
-  type: object
-  properties:
-    downloadUri:
-      type: string
-  required:
-    - downloadUri
-integration:
-  id: 67b61532220905ae47e23698
-  name: Box
-  uuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf
-  key: box
-  state: READY
-  errors: []
-  revision: 5b2d7e44-4999-417f-aba0-a37188130cce
-  createdAt: '2025-02-19T17:30:26.819Z'
-  updatedAt: '2025-10-16T15:00:31.870Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/box/logo.png
-  connectorId: 6466783c60f981f3ce6968ef
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 264
-  hasData: true
-  dataCollectionsCount: 6
-  hasEvents: true
-  eventsCount: 1
-  hasGlobalWebhooks: true
-  hasUdm: true
-  authType: oauth2
+parentUuid: a8ad6853-9087-4c80-bcb5-e0c79ee7a0bc
+integrationUuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf

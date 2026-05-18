@@ -1,25 +1,8 @@
-id: 67974ac4d59680b518ef328e
-name: Google Drive
 uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
 key: google-drive
-state: READY
-errors: []
-revision: d233deab-48bf-4974-a5a5-8c158e34a083
-createdAt: '2025-01-27T08:58:44.490Z'
-updatedAt: '2025-10-16T14:59:26.572Z'
-isDeactivated: false
+name: Google Drive
 logoUri: https://static.integration.app/connectors/gdrive/logo.png
-connectorId: 642e822e986ed1caad090f1d
-connectorVersion: 3.0.0
-hasMissingParameters: false
-hasDocumentation: true
-hasOperations: true
-operationsCount: 51
-hasData: true
-dataCollectionsCount: 3
-hasEvents: false
-eventsCount: 0
-hasGlobalWebhooks: false
-hasUdm: true
-appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-authType: oauth2
+oAuthCallbackUri: https://api.integration.app/oauth-callback
+connectorVersion: 3.2.13
+connectorUuid: 807b49bf-b10b-4b93-997b-cf89e92a5589
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

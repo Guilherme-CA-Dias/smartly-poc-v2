@@ -1,13 +1,8 @@
-id: 67e3ec5ea77e96adf253943a
-name: Find Content Item By Id
-uuid: c49dbd3b-17f8-4895-ae77-124d42e16132
+uuid: 0137298b-20bf-4fe0-aaae-4aca61190f10
 key: find-content-item-by-id
-state: READY
-errors: []
-revision: 2b0b9139-973e-4dea-b174-23bccc13e5fa
-createdAt: '2025-03-26T12:00:30.465Z'
-updatedAt: '2025-03-26T15:59:05.645Z'
-isDeactivated: false
+name: Find Content Item By Id
+isCustomized: true
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -21,4 +16,3 @@ config:
     $var: $.input.id
   fieldMapping:
     key: content-items
-isCustomized: true

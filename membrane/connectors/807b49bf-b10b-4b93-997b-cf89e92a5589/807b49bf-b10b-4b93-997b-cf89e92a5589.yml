@@ -1,0 +1,199 @@
+key: google-drive
+name: Google Drive
+logoUri: https://static.integration.app/connectors/gdrive/logo.png
+categories:
+  - File Storage
+  - Document Management
+parametersSchema:
+  description: >-
+    ## How to set up Google Drive OAuth application and get your Client ID and
+    Client Secret
+
+
+    ### Project Setup
+
+
+    - Go to the Google [API Console](https://console.cloud.google.com/).
+
+    - Create a new project (if you haven't already) by clicking on the "Select a
+    project" drop down menu and selecting “New project”
+
+    - Add necessary API’s from the Library (`google drive api`)
+
+
+    In case you'd rather follow the **official Google documentation**, you can
+    find it
+    [here](https://developers.google.com/workspace/guides/create-project).
+
+
+    ### Configure the OAuth application
+
+
+    - Click on the OAuth consent screen item in the left sidebar
+
+    - Choose the User Type = external
+
+    - To be able to put your organization domain into the “Authorized domain”
+    field, have it go through the Google Search console (to make sure it’s
+    authorized and follow the authorization process in case it’s not authorized
+    yet)
+
+    - Add the following scopes(To determine the required scopes for your use
+    case, refer to the [API
+    documentation](https://developers.google.com/drive/api/reference/rest/v3)):
+      - [https://www.googleapis.com/auth/drive](https://www.googleapis.com/auth/drive)
+      - [https://www.googleapis.com/auth/drive.file](https://www.googleapis.com/auth/drive.file)
+      - [https://www.googleapis.com/auth/drive.metadata.readonly](https://www.googleapis.com/auth/drive.metadata.readonly)
+      - [https://www.googleapis.com/auth/userinfo.profile](https://www.googleapis.com/auth/userinfo.profile)
+      - [https://www.googleapis.com/auth/userinfo.email](https://www.googleapis.com/auth/userinfo.email)
+
+    You can find the list of the available scopes
+    [here](https://developers.google.com/identity/protocols/oauth2/scopes).
+
+
+    ### Generate Credentials
+
+
+    - Select Credentials > Create credentials > OAuth client ID.
+
+    - Select Web application as the application type
+
+    - Add Authorised redirect URIs:
+    `https://api.getmembrane.com/oauth-callback`. **IMPORTANT**: to get the app
+    approved, you need to use **custom redirect URI** functionality and not
+    mention getmembrane.com anywhere in your app setup
+
+    - Click "CREATE"
+
+    - Copy the Client ID and Client Secret from the dialog that appears
+
+
+    #### Publish your app
+
+
+    Note that if you want your app to be accessible to other users outside of
+    your organization, you may want to submit it for review. You can find more
+    information about the process
+    [here](https://support.google.com/cloud/answer/9110914?hl=en)
+
+
+    ### Configure the app parameters in the getmembrane.com platform
+
+
+    - Add the Google Drive app from store in the Getmembrane.com
+    [console](https://console.getmembrane.com/)
+
+    - Click **Configure & Test**
+
+    - In the **Parameters** section, select a **Use custom parameters** toggle /
+    **Edit Parameters**
+
+    - Fill in **Client Id** and **Client Secret**
+
+    - Add scopes your application may require
+  type: object
+makeApiClient:
+  type: mapping
+  mapping:
+    args:
+      baseUri: https://www.googleapis.com/drive/v3
+      headers:
+        Authorization:
+          $concat:
+            delimiter: ' '
+            values:
+              - Bearer
+              - $var: $.credentials.access_token
+getOAuthConfig:
+  type: mapping
+  mapping:
+    clientId:
+      $var: $.connectorParameters.clientId
+    clientSecret:
+      $var: $.connectorParameters.clientSecret
+    authorizeUri: https://accounts.google.com/o/oauth2/auth
+    tokenUri: https://oauth2.googleapis.com/token
+    scopes:
+      $var: $.connectorParameters.scopes
+    extra:
+      prompt: consent
+      access_type: offline
+getCredentialsFromAccessTokenResponse:
+  type: javascript
+  code: |
+    export default async function getCredentialsFromTokenResponse({
+      tokenResponse,
+      credentials,
+    }): Promise<any> {
+      return {
+        access_token: tokenResponse.access_token,
+        expires_in: tokenResponse.expires_in,
+        scope: tokenResponse.scope,
+        token_type: tokenResponse.token_type,
+        // Google OAuth 2.0 does not return refresh_token in token response
+        refresh_token: tokenResponse?.refresh_token ?? credentials?.refresh_token,
+      }
+    }
+disconnect:
+  type: javascript
+  code: |2-
+     export default async function disconnect({ credentials }) {     
+      const token = credentials.refresh_token ?? credentials.access_token
+      await fetch(`https://oauth2.googleapis.com/revoke?token=${token}`, {                                                                                           
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },                                                                                            
+      })                                                            
+    }
+options:
+  auth-proxy:
+    type: proxy
+    proxyKey: google-drive
+    title: Auth Proxy
+  oauth2:
+    type: oauth2
+    parametersSchema:
+      description: >-
+        Create an OAuth client in the [Google Cloud
+        Console](https://console.cloud.google.com/apis/credentials) with the
+        **Google Drive API** enabled. See the [workspace setup
+        guide](https://developers.google.com/workspace/guides/create-project)
+        for detailed instructions.
+      type: object
+      properties:
+        clientId:
+          title: Client ID
+          description: >-
+            From the OAuth 2.0 client in your [Google Cloud
+            Console](https://console.cloud.google.com/apis/credentials)
+          type: string
+        clientSecret:
+          title: Client Secret
+          description: >-
+            From the OAuth 2.0 client in your [Google Cloud
+            Console](https://console.cloud.google.com/apis/credentials)
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - https://www.googleapis.com/auth/drive
+              - https://www.googleapis.com/auth/drive.file
+              - https://www.googleapis.com/auth/drive.activity.readonly
+              - https://www.googleapis.com/auth/drive.metadata.readonly
+              - https://www.googleapis.com/auth/userinfo.profile
+              - https://www.googleapis.com/auth/userinfo.email
+            allowCustom: true
+          default:
+            - https://www.googleapis.com/auth/drive
+            - https://www.googleapis.com/auth/drive.file
+            - https://www.googleapis.com/auth/drive.activity.readonly
+            - https://www.googleapis.com/auth/drive.metadata.readonly
+            - https://www.googleapis.com/auth/userinfo.profile
+            - https://www.googleapis.com/auth/userinfo.email
+      required:
+        - clientId
+        - clientSecret
+    title: OAuth2
+uuid: 807b49bf-b10b-4b93-997b-cf89e92a5589
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

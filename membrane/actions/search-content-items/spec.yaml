@@ -1,13 +1,8 @@
-id: 68ee7b841233428e98163dd0
-name: Search Content Items
-uuid: df6125e2-ead9-41cc-b6b2-4e280962c3de
+uuid: bdb29977-3359-45d9-99ff-6511b55253f3
 key: search-content-items
-state: READY
-errors: []
-revision: 5efab5b4-1a68-4286-9e85-2b8275d5a30e
-createdAt: '2025-10-14T16:34:12.753Z'
-updatedAt: '2025-10-16T11:32:17.445Z'
-isDeactivated: false
+name: Search Content Items
+isCustomized: true
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -16,4 +11,3 @@ inputSchema:
     query:
       type: string
 type: search-data-record
-isCustomized: true

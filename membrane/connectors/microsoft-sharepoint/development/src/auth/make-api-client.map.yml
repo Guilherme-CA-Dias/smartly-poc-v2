@@ -1,9 +1,0 @@
-args:
-  baseUri: https://graph.microsoft.com/v1.0
-  headers:
-    Authorization:
-      $concat:
-        values:
-          - Bearer
-          - $var: $.credentials.access_token
-        delimiter: ' '

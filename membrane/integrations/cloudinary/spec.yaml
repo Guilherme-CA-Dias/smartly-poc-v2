@@ -1,0 +1,8 @@
+uuid: aa466028-08f9-4868-921d-21b3716cb69f
+key: cloudinary
+name: Cloudinary
+logoUri: >-
+  https://static.integration.app/apps/3c4f26e0-7536-456e-8d71-ee38ec718768/logo.png
+connectorVersion: 1.0.2
+connectorUuid: 5aa6b49d-7a2e-41ba-a007-c321712ebc84
+externalAppUuid: 3c4f26e0-7536-456e-8d71-ee38ec718768

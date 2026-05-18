@@ -1,16 +1,8 @@
-id: 67e3ec7dc5ee3b01289e4a02
-name: Content Items
 uuid: 770370c9-c1dc-4b5e-808f-cab35bb0c381
 key: content-items
-revision: 5826301b-4baf-43fd-9329-96445cead491
-createdAt: '2025-03-26T12:01:01.567Z'
-updatedAt: '2025-04-04T13:57:49.005Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67974ac4d59680b518ef328e
-universalFieldMappingId: 67e3ec616446443b8d435553
+name: Content Items
+isCustomized: true
 dataSourceKey: content-items
-dataSourceId: 67e3ec664d749db24a619bf3
 appSchema:
   type: object
   properties:
@@ -83,31 +75,7 @@ importValue:
           to: false
         - from: drive
           to: false
-isCustomized: true
-universalFieldMappingRevision: 1a9d9c11-2de6-4bf2-8734-42b549303de7
-integration:
-  id: 67974ac4d59680b518ef328e
-  name: Google Drive
-  uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
-  key: google-drive
-  state: READY
-  errors: []
-  revision: d233deab-48bf-4974-a5a5-8c158e34a083
-  createdAt: '2025-01-27T08:58:44.490Z'
-  updatedAt: '2025-10-16T14:59:26.572Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/gdrive/logo.png
-  connectorId: 642e822e986ed1caad090f1d
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 51
-  hasData: true
-  dataCollectionsCount: 3
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-  authType: oauth2
+parentUuid: 7b611865-b3ca-4ff9-8fd6-54523fceb729
+integrationUuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
+dataSourceUuid: c97444c7-308f-4dfb-9584-e2be48f4044e

@@ -1,15 +1,7 @@
-id: 67e41457c5ee3b0128a2d146
-name: Receive Content Item Events
 uuid: bf5a082b-17a6-4494-bae5-2bfe386a8d75
 key: receive-content-item-events
-state: READY
-errors: []
-revision: ced26147-071b-4004-9214-fe2a2c246f41
-createdAt: '2025-03-26T14:51:03.469Z'
-updatedAt: '2025-10-14T11:08:42.359Z'
-isDeactivated: false
-integrationId: 67974ac4d59680b518ef328e
-universalFlowId: 67e414264539c5ecbdd02ec2
+name: Receive Content Item Events
+isCustomized: false
 nodes:
   find-record-by-id:
     type: find-data-record-by-id
@@ -21,8 +13,60 @@ nodes:
         $var: $.input.content-item-created-trigger.record.id
       fieldMapping:
         key: content-items
+    outputSchema:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        uri:
+          type: string
+          format: url
+        createdTime:
+          type: string
+          format: datetime
+        updatedTime:
+          type: string
+          format: datetime
+        deletedTime:
+          type: string
+          format: datetime
+        createdById:
+          type: string
+        updatedById:
+          type: string
+        fields:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id
+            title:
+              type: string
+              title: Title
+            createdAt:
+              type: string
+              title: Created At
+            updatedAt:
+              type: string
+              title: Updated At
+            parentId:
+              type: string
+              title: Parent Id
+            canHaveChildren:
+              type: boolean
+              title: Can Have Children
+            resourceURI:
+              type: string
+              title: Resource Uri
+            canDownload:
+              type: boolean
+              title: Can Download
+      title: Find record-by-id
     links:
       - key: send-created-event-to-my-app
+    dependencies: []
   find-data-record-by-id:
     type: find-data-record-by-id
     name: Find Data Record By Id
@@ -33,8 +77,60 @@ nodes:
         $var: $.input.content-item-updated-trigger.record.id
       fieldMapping:
         key: content-items
+    outputSchema:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        uri:
+          type: string
+          format: url
+        createdTime:
+          type: string
+          format: datetime
+        updatedTime:
+          type: string
+          format: datetime
+        deletedTime:
+          type: string
+          format: datetime
+        createdById:
+          type: string
+        updatedById:
+          type: string
+        fields:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id
+            title:
+              type: string
+              title: Title
+            createdAt:
+              type: string
+              title: Created At
+            updatedAt:
+              type: string
+              title: Updated At
+            parentId:
+              type: string
+              title: Parent Id
+            canHaveChildren:
+              type: boolean
+              title: Can Have Children
+            resourceURI:
+              type: string
+              title: Resource Uri
+            canDownload:
+              type: boolean
+              title: Can Download
+      title: Find Data Record By Id
     links:
       - key: send-updated-request-to-your-app
+    dependencies: []
   send-created-event-to-my-app:
     type: api-request-to-your-app
     name: Send created Event to My App
@@ -47,7 +143,18 @@ nodes:
             $var: $.input.find-record-by-id.fields
           connectionId:
             $var: $.connection.id
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send created Event to My App
     links: []
+    dependencies: []
   send-deleted-event-to-my-app:
     type: api-request-to-your-app
     name: Send deleted event to My App
@@ -58,7 +165,18 @@ nodes:
           id:
             $var: $.input.content-item-deleted-trigger.record.id
         uri: /api/webhooks/on-delete
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send deleted event to My App
     links: []
+    dependencies: []
   send-updated-request-to-your-app:
     type: api-request-to-your-app
     name: Send Updated request to your app
@@ -71,7 +189,18 @@ nodes:
             $var: $.connection.id
           fields:
             $var: $.input.find-data-record-by-id.fields
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: Send Updated request to your app
     links: []
+    dependencies: []
   content-item-created-trigger:
     type: data-record-created-trigger
     name: Content Item Created Trigger
@@ -80,8 +209,65 @@ nodes:
         key: content-items
       fieldMapping:
         key: content-items
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            uri:
+              type: string
+              format: url
+            createdTime:
+              type: string
+              format: datetime
+            updatedTime:
+              type: string
+              format: datetime
+            deletedTime:
+              type: string
+              format: datetime
+            createdById:
+              type: string
+            updatedById:
+              type: string
+            fields:
+              type: object
+              properties:
+                id:
+                  type: string
+                  title: Id
+                title:
+                  type: string
+                  title: Title
+                createdAt:
+                  type: string
+                  title: Created At
+                updatedAt:
+                  type: string
+                  title: Updated At
+                parentId:
+                  type: string
+                  title: Parent Id
+                canHaveChildren:
+                  type: boolean
+                  title: Can Have Children
+                resourceURI:
+                  type: string
+                  title: Resource Uri
+                canDownload:
+                  type: boolean
+                  title: Can Download
+      title: Content Item Created Trigger
     links:
       - key: find-record-by-id
+    dependencies: []
   content-item-deleted-trigger:
     type: data-record-deleted-trigger
     name: Content Item Deleted Trigger
@@ -89,8 +275,20 @@ nodes:
       dataSource:
         key: content-items
       fieldMapping: {}
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+      title: Content Item Deleted Trigger
     links:
       - key: send-deleted-event-to-my-app
+    dependencies: []
   content-item-updated-trigger:
     type: data-record-updated-trigger
     name: Content Item Updated Trigger
@@ -99,34 +297,66 @@ nodes:
         key: content-items
       fieldMapping:
         key: content-items
+    outputSchema:
+      type: object
+      properties:
+        type:
+          type: string
+        record:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            uri:
+              type: string
+              format: url
+            createdTime:
+              type: string
+              format: datetime
+            updatedTime:
+              type: string
+              format: datetime
+            deletedTime:
+              type: string
+              format: datetime
+            createdById:
+              type: string
+            updatedById:
+              type: string
+            fields:
+              type: object
+              properties:
+                id:
+                  type: string
+                  title: Id
+                title:
+                  type: string
+                  title: Title
+                createdAt:
+                  type: string
+                  title: Created At
+                updatedAt:
+                  type: string
+                  title: Updated At
+                parentId:
+                  type: string
+                  title: Parent Id
+                canHaveChildren:
+                  type: boolean
+                  title: Can Have Children
+                resourceURI:
+                  type: string
+                  title: Resource Uri
+                canDownload:
+                  type: boolean
+                  title: Can Download
+      title: Content Item Updated Trigger
     links:
       - key: find-data-record-by-id
+    dependencies: []
 autoCreateInstances: true
-isCustomized: false
-universalFlowRevision: ced26147-071b-4004-9214-fe2a2c246f41
-integration:
-  id: 67974ac4d59680b518ef328e
-  name: Google Drive
-  uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
-  key: google-drive
-  state: READY
-  errors: []
-  revision: d233deab-48bf-4974-a5a5-8c158e34a083
-  createdAt: '2025-01-27T08:58:44.490Z'
-  updatedAt: '2025-10-16T14:59:26.572Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/gdrive/logo.png
-  connectorId: 642e822e986ed1caad090f1d
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 51
-  hasData: true
-  dataCollectionsCount: 3
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-  authType: oauth2
+parentUuid: 512afd4e-d89e-481a-be72-c71ac29c332b
+integrationUuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

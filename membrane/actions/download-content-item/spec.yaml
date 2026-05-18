@@ -1,13 +1,8 @@
-id: 67e3ec5d124af3a6b1469421
-name: Download Content Item
-uuid: 59036e98-b3b2-47b9-afa6-430bcbddd94e
+uuid: a8ad6853-9087-4c80-bcb5-e0c79ee7a0bc
 key: download-content-item
-state: READY
-errors: []
-revision: aa614d82-bffa-4013-9470-57970e1fe3b4
-createdAt: '2025-03-26T12:00:29.611Z'
-updatedAt: '2025-03-26T12:46:46.491Z'
-isDeactivated: false
+name: Download Content Item
+isCustomized: false
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -23,4 +18,3 @@ customOutputSchema:
       type: string
     content:
       type: string
-isCustomized: false

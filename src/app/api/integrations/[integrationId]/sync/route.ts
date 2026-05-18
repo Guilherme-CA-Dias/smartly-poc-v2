@@ -1,5 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthFromRequest } from "@/lib/server-auth";
+
+const INTEGRATION_APP_API = "https://api.integration.app";
+
+async function triggerFlowRuns(token: string, integrationKey: string, documentIds: string[]) {
+  await Promise.all(
+    documentIds.map((documentId) =>
+      fetch(
+        `${INTEGRATION_APP_API}/flows/download-content-item/run?layer=connection&integrationKey=${integrationKey}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ input: { documentId } }),
+        }
+      ).then((res) => {
+        if (!res.ok) {
+          return res.text().then((msg) => {
+            console.error(`Flow run failed for document ${documentId}:`, msg);
+          });
+        }
+      })
+    )
+  );
+}
 import { generateCustomerAccessToken } from "@/lib/integration-token";
 import connectDB from "@/lib/mongodb";
 import { SyncModel, SyncStatus } from "@/models/sync";
@@ -13,7 +39,7 @@ export async function POST(
 ): Promise<NextResponse<SyncRouteResponse>> {
   try {
     const connectionId = (await params).integrationId;
-    const { integrationId, integrationName, integrationLogo, documentIds } =
+    const { integrationId, integrationKey, integrationName, integrationLogo, documentIds } =
       (await request.json()) as SyncRequestBody;
 
     const auth = getAuthFromRequest(request);
@@ -47,6 +73,10 @@ export async function POST(
     } satisfies SyncEventData;
 
     syncDocuments(eventData).catch(console.error);
+
+    if (documentIds && documentIds.length > 0) {
+      triggerFlowRuns(token, integrationKey, documentIds).catch(console.error);
+    }
 
     return NextResponse.json({ status: SyncStatus.in_progress });
   } catch (error) {

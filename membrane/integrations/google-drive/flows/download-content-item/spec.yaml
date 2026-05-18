@@ -1,15 +1,7 @@
-id: 67e3ec9b6446443b8d435bbe
-name: Download Content Item
 uuid: 9988c109-ec37-479b-9a26-b5ae15b882ee
 key: download-content-item
-state: READY
-errors: []
-revision: d6d9ea4b-00b9-4570-b05d-a592aaa9cd07
-createdAt: '2025-03-26T12:01:31.842Z'
-updatedAt: '2025-10-13T07:15:53.226Z'
-isDeactivated: false
-integrationId: 67974ac4d59680b518ef328e
-universalFlowId: 67e3ec62e1bedcd237b0db0b
+name: Download Content Item
+isCustomized: false
 nodes:
   api-trigger:
     type: api-trigger
@@ -20,8 +12,20 @@ nodes:
         properties:
           documentId:
             type: string
+    inputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+    outputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+      title: API Trigger
     links:
       - key: download-file-or-markdown
+    dependencies: []
   api-request-to-your-app:
     type: api-request-to-your-app
     name: API Request to Your App
@@ -38,7 +42,18 @@ nodes:
             $var: $.connection.id
           downloadURI:
             $var: $.input.download-file-or-markdown.downloadURI
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: API Request to Your App
     links: []
+    dependencies: []
   download-file-or-markdown:
     type: run-action
     name: Download file or markdown
@@ -48,34 +63,16 @@ nodes:
       input:
         id:
           $var: $.input.api-trigger.documentId
+    outputSchema:
+      type: object
+      properties:
+        downloadURI:
+          type: string
+      title: Download file or markdown
     links:
       - key: api-request-to-your-app
-autoCreateInstances: false
-isCustomized: false
-universalFlowRevision: d6d9ea4b-00b9-4570-b05d-a592aaa9cd07
-integration:
-  id: 67974ac4d59680b518ef328e
-  name: Google Drive
-  uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
-  key: google-drive
-  state: READY
-  errors: []
-  revision: d233deab-48bf-4974-a5a5-8c158e34a083
-  createdAt: '2025-01-27T08:58:44.490Z'
-  updatedAt: '2025-10-16T14:59:26.572Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/gdrive/logo.png
-  connectorId: 642e822e986ed1caad090f1d
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 51
-  hasData: true
-  dataCollectionsCount: 3
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-  authType: oauth2
+    dependencies: []
+autoCreateInstances: true
+parentUuid: 7e4bebe8-e831-45bc-a391-d86f04b802c0
+integrationUuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

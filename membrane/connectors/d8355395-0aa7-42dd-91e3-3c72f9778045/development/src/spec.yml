@@ -1,0 +1,46 @@
+key: aws-s3-compatible
+name: AWS S3 Compatible
+appUuid: 42eefa5b-2f94-40bc-9936-4846c4b66566
+auth:
+  type: client-credentials
+  inputSchema:
+    description: >-
+      Connect to AWS S3 or S3-compatible services (MinIO, DigitalOcean Spaces,
+      etc.). For S3-compatible services, provide the endpoint URL.
+    type: object
+    properties:
+      AWS_ACCESS_KEY_ID:
+        title: Access Key ID
+        description: Your AWS Access Key ID
+        type: string
+      AWS_SECRET_ACCESS_KEY:
+        title: Secret Access Key
+        description: Your AWS Secret Access Key
+        type: string
+        isSensitive: true
+      AWS_REGION:
+        title: Region (Optional)
+        description: >-
+          AWS region (e.g., us-east-1, eu-west-1). Defaults to us-east-1 if not
+          specified.
+        type: string
+      ENDPOINT_URL:
+        title: Endpoint URL (Optional)
+        description: >-
+          For S3-compatible services, provide the endpoint URL (e.g.,
+          https://minio.example.com or https://nyc3.digitaloceanspaces.com).
+          Leave empty for AWS S3.
+        type: string
+      LIBRARY_ID:
+        title: Library ID
+        description: Your Library ID for organizing and managing resources
+        type: string
+    required:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+  makeApiClient:
+    implementationType: javascript
+  test:
+    implementationType: javascript
+logoUri: >-
+  https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Amazon-S3-Logo.svg/1280px-Amazon-S3-Logo.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail

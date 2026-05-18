@@ -1,0 +1,7 @@
+uuid: b577ac0e-d412-4279-bcba-d1acd5fd9e6e
+key: aws-compatible
+name: AWS Compatible
+logoUri: >-
+  https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Amazon-S3-Logo.svg/1280px-Amazon-S3-Logo.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail
+connectorVersion: 1.0.0
+connectorUuid: d8355395-0aa7-42dd-91e3-3c72f9778045

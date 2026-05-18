@@ -1,16 +1,8 @@
-id: 67e3ec7d2c81a95cd9148d9c
-name: Find Content Item By Id
-uuid: b325d40d-2f7c-4557-9d05-3453d4e4e305
+uuid: 700ee2de-40d6-4166-9609-106d4bc07bbe
 key: find-content-item-by-id
-state: READY
-errors: []
-revision: 5ca615a5-a1a5-4d20-8b09-f7c46db91e9a
-createdAt: '2025-03-26T12:01:01.073Z'
-updatedAt: '2025-03-26T16:05:58.494Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67c85894e972856101c42a67
-parentId: 67e3ec5ea77e96adf253943a
+name: Find Content Item By Id
+isCustomized: false
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -24,29 +16,6 @@ config:
     $var: $.input.id
   fieldMapping:
     key: content-items
-isCustomized: false
-integration:
-  id: 67c85894e972856101c42a67
-  name: Dropbox
-  uuid: e9fac5d2-6751-4886-b242-fd9c38a8f8b0
-  key: dropbox
-  state: READY
-  errors: []
-  createdAt: '2025-03-05T13:58:44.562Z'
-  updatedAt: '2025-03-05T13:59:11.187Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/dropbox/logo.png
-  connectorId: 643eac8bbadd839bce5b1114
-  connectorVersion: 2.2.0
-  hasMissingParameters: false
-  hasDocumentation: false
-  hasOperations: true
-  operationsCount: 137
-  hasData: true
-  dataCollectionsCount: 1
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: 8fefbe47-1ebc-4208-abb1-2498f4bf573b
-  authType: oauth2
+parentUuid: 0137298b-20bf-4fe0-aaae-4aca61190f10
+integrationUuid: e9fac5d2-6751-4886-b242-fd9c38a8f8b0
+externalAppUuid: 8fefbe47-1ebc-4208-abb1-2498f4bf573b

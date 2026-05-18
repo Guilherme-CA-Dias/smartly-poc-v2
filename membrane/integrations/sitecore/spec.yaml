@@ -1,0 +1,8 @@
+uuid: 84ae8bef-244c-47cd-8c65-30f4edd63eb8
+key: sitecore
+name: Sitecore
+logoUri: >-
+  https://static.integration.app/apps/82c0be67-b359-43db-a925-5d9fcda9743f/logo.png
+connectorVersion: 1.0.0
+connectorUuid: b2ba3b5a-49d0-476b-a6bb-4d9f6c277dbb
+externalAppUuid: 82c0be67-b359-43db-a925-5d9fcda9743f

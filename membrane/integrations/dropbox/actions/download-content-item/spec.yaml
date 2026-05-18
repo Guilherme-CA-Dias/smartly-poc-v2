@@ -1,16 +1,7 @@
-id: 67e3ec721c9beee7de91eb85
-name: Download Content Item
-uuid: 88e0030c-6aaf-458b-82be-3590b873ec30
+uuid: 11fc0fe3-31bf-44a7-a28c-61182d8085df
 key: download-content-item
-state: READY
-errors: []
-revision: 1ad09304-8a21-4c3a-835e-465c0a69d913
-createdAt: '2025-03-26T12:00:50.160Z'
-updatedAt: '2025-03-26T12:01:31.426Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67c85894e972856101c42a67
-parentId: 67e3ec5d124af3a6b1469421
+name: Download Content Item
+isCustomized: true
 inputSchema:
   type: object
   properties:
@@ -27,29 +18,6 @@ config:
 outputMapping:
   downloadURI:
     $var: $.output.downloadUri
-isCustomized: true
-integration:
-  id: 67c85894e972856101c42a67
-  name: Dropbox
-  uuid: e9fac5d2-6751-4886-b242-fd9c38a8f8b0
-  key: dropbox
-  state: READY
-  errors: []
-  createdAt: '2025-03-05T13:58:44.562Z'
-  updatedAt: '2025-03-05T13:59:11.187Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/dropbox/logo.png
-  connectorId: 643eac8bbadd839bce5b1114
-  connectorVersion: 2.2.0
-  hasMissingParameters: false
-  hasDocumentation: false
-  hasOperations: true
-  operationsCount: 137
-  hasData: true
-  dataCollectionsCount: 1
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: 8fefbe47-1ebc-4208-abb1-2498f4bf573b
-  authType: oauth2
+parentUuid: a8ad6853-9087-4c80-bcb5-e0c79ee7a0bc
+integrationUuid: e9fac5d2-6751-4886-b242-fd9c38a8f8b0
+externalAppUuid: 8fefbe47-1ebc-4208-abb1-2498f4bf573b

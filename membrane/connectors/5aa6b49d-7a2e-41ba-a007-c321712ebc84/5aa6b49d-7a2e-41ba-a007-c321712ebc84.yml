@@ -1,0 +1,65 @@
+key: cloudinary
+name: Cloudinary
+logoUri: >-
+  https://static.integration.app/apps/3c4f26e0-7536-456e-8d71-ee38ec718768/logo.png
+categories: []
+type: client-credentials
+inputSchema:
+  description: >-
+    Find your credentials in the [Cloudinary Console Settings > API
+    Keys](https://console.cloudinary.com/settings/api-keys) page.
+  type: object
+  properties:
+    cloud_name:
+      title: Cloud Name
+      description: Your Cloudinary product environment identifier
+      type: string
+    api_key:
+      title: API Key
+      description: Your Cloudinary API Key
+      type: string
+    api_secret:
+      title: API Secret
+      description: Your Cloudinary API Secret (keep this confidential)
+      type: string
+      isSensitive: true
+  required:
+    - cloud_name
+    - api_key
+    - api_secret
+parametersSchema:
+  type: object
+  properties: {}
+makeApiClient:
+  type: mapping
+  mapping:
+    args:
+      baseUri:
+        $concat:
+          values:
+            - https://api.cloudinary.com/v1_1/
+            - $var: $.credentials.cloud_name
+      auth:
+        username:
+          $var: $.credentials.api_key
+        password:
+          $var: $.credentials.api_secret
+test:
+  type: javascript
+  code: |-
+    export default async function test({ apiClient }) {
+      const response = await apiClient.get('/ping');
+      return response.status === 'ok';
+    }
+ui:
+  schema:
+    type: object
+    properties:
+      cloud_name:
+        type: string
+      api_key:
+        type: string
+      api_secret:
+        type: string
+uuid: 5aa6b49d-7a2e-41ba-a007-c321712ebc84
+externalAppUuid: 3c4f26e0-7536-456e-8d71-ee38ec718768

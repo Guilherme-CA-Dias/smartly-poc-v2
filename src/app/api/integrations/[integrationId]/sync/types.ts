@@ -28,6 +28,7 @@ export interface SyncEventData {
 
 export interface SyncRequestBody {
   integrationId: string;
+  integrationKey: string;
   integrationName: string;
   integrationLogo?: string;
   documentIds?: string[];

@@ -1,6 +1,0 @@
-baseUri: https://api.box.com/2.0
-headers:
-  authorization:
-    $concat:
-      - 'Bearer '
-      - $var: credentials.access_token

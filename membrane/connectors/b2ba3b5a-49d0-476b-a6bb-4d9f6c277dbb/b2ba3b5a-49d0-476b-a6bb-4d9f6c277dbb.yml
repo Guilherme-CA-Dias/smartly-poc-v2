@@ -1,0 +1,159 @@
+key: sitecore
+name: Sitecore
+categories: []
+type: client-credentials
+customCredentialsSchema:
+  type: object
+  properties:
+    accessToken:
+      type: string
+      isSensitive: true
+    expiresAt:
+      type: number
+    audience:
+      type: string
+    clientId:
+      type: string
+      isSensitive: true
+    clientSecret:
+      type: string
+      isSensitive: true
+inputSchema:
+  description: >-
+    Enter your Sitecore Cloud credentials. You can create these in the [Sitecore
+    Cloud Portal](https://portal.sitecorecloud.io) under your app's credentials
+    section (e.g., XM Cloud Deploy > Credentials).
+  type: object
+  properties:
+    clientId:
+      title: Client ID
+      description: The Client ID from your Sitecore Cloud credentials
+      type: string
+    clientSecret:
+      title: Client Secret
+      description: >-
+        The Client Secret from your Sitecore Cloud credentials (only visible
+        once when created)
+      type: string
+      format: password
+    audience:
+      title: Audience
+      description: >-
+        The API audience for the access token. Common values:
+        https://api.sitecorecloud.io (XM Apps/Sites),
+        https://xmclouddeploy-api.sitecorecloud.io (Deploy API)
+      type: string
+      default: https://api.sitecorecloud.io
+  required:
+    - clientId
+    - clientSecret
+parametersSchema:
+  type: object
+  properties: {}
+getCredentialsFromConnectionParameters:
+  type: javascript
+  code: |-
+    export default async function({ connectionParameters }) {
+      const tokenUrl = 'https://auth.sitecorecloud.io/oauth/token';
+      const audience = connectionParameters.audience || 'https://api.sitecorecloud.io';
+      
+      const body = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: connectionParameters.clientId,
+        client_secret: connectionParameters.clientSecret,
+        audience: audience
+      });
+
+      const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body.toString()
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to obtain access token: ${response.status} - ${errorText}`);
+      }
+
+      const tokenData = await response.json();
+      
+      // Calculate expiration time (token expires in 24 hours / 86400 seconds)
+      const expiresAt = Date.now() + (tokenData.expires_in * 1000);
+
+      return {
+        accessToken: tokenData.access_token,
+        expiresAt: expiresAt,
+        audience: audience,
+        // Store original credentials for refresh
+        clientId: connectionParameters.clientId,
+        clientSecret: connectionParameters.clientSecret
+      };
+    }
+refreshCredentials:
+  type: javascript
+  code: |-
+    export default async function({ credentials }) {
+      const tokenUrl = 'https://auth.sitecorecloud.io/oauth/token';
+      
+      const body = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: credentials.clientId,
+        client_secret: credentials.clientSecret,
+        audience: credentials.audience || 'https://api.sitecorecloud.io'
+      });
+
+      const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body.toString()
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to refresh access token: ${response.status} - ${errorText}`);
+      }
+
+      const tokenData = await response.json();
+      const expiresAt = Date.now() + (tokenData.expires_in * 1000);
+
+      return {
+        ...credentials,
+        accessToken: tokenData.access_token,
+        expiresAt: expiresAt
+      };
+    }
+makeApiClient:
+  type: mapping
+  mapping:
+    baseUri: https://xmclouddeploy-api.sitecorecloud.io
+    headers:
+      Authorization:
+        $concat:
+          - 'Bearer '
+          - $var: credentials.accessToken
+      Content-Type: application/json
+      Accept: application/json
+test:
+  type: javascript
+  code: |-
+    export default async function({ apiClient }) {
+      try {
+        // Try to list projects from the XM Cloud Deploy API
+        // This endpoint requires authentication and will validate our token
+        const response = await apiClient.get('/api/projects/v1');
+        
+        // If we get here without an error, the authentication is working
+        // The response should be an array of projects (could be empty)
+        return Array.isArray(response) || (response && typeof response === 'object');
+      } catch (error) {
+        // Log the error for debugging
+        console.error('Test failed:', error.message);
+        throw error;
+      }
+    }
+uuid: b2ba3b5a-49d0-476b-a6bb-4d9f6c277dbb
+externalAppUuid: 82c0be67-b359-43db-a925-5d9fcda9743f

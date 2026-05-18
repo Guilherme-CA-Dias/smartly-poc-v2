@@ -1,0 +1,23 @@
+uuid: 00d62d6f-36f9-4db4-b8b9-1f57ec5d0cb9
+key: download-content-item
+name: Download Content Item
+isCustomized: false
+isUniversal: true
+inputSchema:
+  type: object
+  properties:
+    id:
+      type: string
+  required:
+    - id
+type: connector-operation
+customOutputSchema:
+  type: object
+  properties:
+    downloadURI:
+      type: string
+    content:
+      type: string
+parentUuid: a8ad6853-9087-4c80-bcb5-e0c79ee7a0bc
+integrationUuid: f6369feb-eea4-4b8e-b9f3-6b3d9ce90391
+externalAppUuid: 1f094dfd-a2dc-4cbb-89e9-cafb2298fcc3

@@ -1,5 +1,0 @@
-name: all-events
-key: all-events
-methods:
-  handle:
-    implementationType: javascript

@@ -3,9 +3,10 @@
 import { Integration } from "@integration-app/sdk";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, Zap } from "lucide-react";
 import { DocumentPicker } from "@/app/integrations/components/document-picker";
 import { SyncHistoryModal } from "@/app/integrations/components/sync-history-modal";
+import { FlowInstancesModal } from "@/app/integrations/components/flow-instances-modal";
 import { getAuthHeaders } from "@/app/auth-provider";
 import Image from "next/image";
 import { useIntegrationApp } from "@integration-app/react";
@@ -29,6 +30,7 @@ export function IntegrationListItem({
   const { triggerRefresh } = useSyncNotifications();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isFlowsOpen, setIsFlowsOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
@@ -94,6 +96,7 @@ export function IntegrationListItem({
           },
           body: JSON.stringify({
             integrationId: integration.id,
+            integrationKey: integration.key,
             integrationName: integration.name,
             integrationLogo: integration.logoUri,
             documentIds:
@@ -148,6 +151,14 @@ export function IntegrationListItem({
         onOpenChange={setIsHistoryOpen}
       />
 
+      <FlowInstancesModal
+        connectionId={integration.connection?.id || ""}
+        integrationKey={integration.key}
+        integrationName={integration.name}
+        open={isFlowsOpen}
+        onOpenChange={setIsFlowsOpen}
+      />
+
       <div
         className={cn(
           "flex items-center justify-between p-4 pl-0 bg-white border-b"
@@ -179,6 +190,15 @@ export function IntegrationListItem({
         <div className="flex items-center gap-2">
           {integration.connection ? (
             <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFlowsOpen(true)}
+                disabled={!integration.connection?.id}
+              >
+                <Zap className="w-4 h-4 mr-2" />
+                Flows
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

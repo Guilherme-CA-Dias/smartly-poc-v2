@@ -1,15 +1,7 @@
-id: 68ee7c6501c8d332a84c1980
-name: Search Content Items
-uuid: df6125e2-ead9-41cc-b6b2-4e280962c3de
+uuid: 88de0e20-f6d9-459d-9c2b-ab38c32107e4
 key: search-content-items
-state: READY
-errors: []
-revision: 5efab5b4-1a68-4286-9e85-2b8275d5a30e
-createdAt: '2025-10-14T16:37:57.428Z'
-updatedAt: '2025-10-16T11:32:17.628Z'
-isDeactivated: false
-integrationId: 67b61532220905ae47e23698
-parentId: 68ee7b841233428e98163dd0
+name: Search Content Items
+isCustomized: true
 inputSchema:
   type: object
   properties:
@@ -19,95 +11,11 @@ inputSchema:
       type: string
 type: search-data-record
 config:
-  fieldMapping: {}
-  dataSource: {}
-isCustomized: false
-outputSchema:
-  type: object
-  properties:
-    cursor:
-      type: string
-    records:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: string
-          name:
-            type: string
-          uri:
-            type: string
-            format: url
-          createdTime:
-            type: string
-            format: datetime
-          updatedTime:
-            type: string
-            format: datetime
-          deletedTime:
-            type: string
-            format: datetime
-          createdById:
-            type: string
-          updatedById:
-            type: string
-          fields:
-            type: object
-defaultOutputSchema:
-  type: object
-  properties:
-    cursor:
-      type: string
-    records:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: string
-          name:
-            type: string
-          uri:
-            type: string
-            format: url
-          createdTime:
-            type: string
-            format: datetime
-          updatedTime:
-            type: string
-            format: datetime
-          deletedTime:
-            type: string
-            format: datetime
-          createdById:
-            type: string
-          updatedById:
-            type: string
-          fields:
-            type: object
-integration:
-  id: 67b61532220905ae47e23698
-  name: Box
-  uuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf
-  key: box
-  state: READY
-  errors: []
-  revision: 5b2d7e44-4999-417f-aba0-a37188130cce
-  createdAt: '2025-02-19T17:30:26.819Z'
-  updatedAt: '2025-10-16T15:00:31.870Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/box/logo.png
-  connectorId: 6466783c60f981f3ce6968ef
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 264
-  hasData: true
-  dataCollectionsCount: 6
-  hasEvents: true
-  eventsCount: 1
-  hasGlobalWebhooks: true
-  hasUdm: true
-  authType: oauth2
+  dataSource:
+    key: content-items
+  fieldMapping:
+    key: content-items
+  query:
+    $var: $.input.query
+parentUuid: bdb29977-3359-45d9-99ff-6511b55253f3
+integrationUuid: fcdd88e0-5946-45fe-bb1b-191cac262bdf

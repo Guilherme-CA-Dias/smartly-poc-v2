@@ -1,0 +1,22 @@
+uuid: d8ecab16-d138-4a10-9168-72beca3a0eda
+key: list-content-items
+name: List Content Items
+isCustomized: false
+isUniversal: true
+inputSchema:
+  type: object
+  properties:
+    cursor:
+      type: string
+    parentId:
+      type: string
+type: list-data-records
+config:
+  dataSource:
+    key: content-items
+  cursor:
+    $var: $.input.cursor
+  fieldMapping: {}
+parentUuid: 5bfcf935-bb7d-48d2-8d65-831d162b4698
+integrationUuid: 84ae8bef-244c-47cd-8c65-30f4edd63eb8
+externalAppUuid: 82c0be67-b359-43db-a925-5d9fcda9743f

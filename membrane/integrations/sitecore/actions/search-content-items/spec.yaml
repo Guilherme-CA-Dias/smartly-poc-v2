@@ -1,0 +1,19 @@
+uuid: 81e4d00a-828e-4dad-bb6f-b0a0211f5d7e
+key: search-content-items
+name: Search Content Items
+isCustomized: false
+isUniversal: true
+inputSchema:
+  type: object
+  properties:
+    cursor:
+      type: string
+    query:
+      type: string
+type: search-data-record
+config:
+  fieldMapping: {}
+  dataSource: {}
+parentUuid: bdb29977-3359-45d9-99ff-6511b55253f3
+integrationUuid: 84ae8bef-244c-47cd-8c65-30f4edd63eb8
+externalAppUuid: 82c0be67-b359-43db-a925-5d9fcda9743f

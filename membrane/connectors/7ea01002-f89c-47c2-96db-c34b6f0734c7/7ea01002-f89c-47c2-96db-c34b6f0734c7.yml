@@ -1,0 +1,138 @@
+key: frontify
+name: Frontify
+logoUri: >-
+  https://static.integration.app/apps/4c0225c4-1afa-4e52-89dc-fa1b6bd75dcc/logo.png
+categories:
+  - Document Management
+  - File Storage
+makeApiClient:
+  type: mapping
+  mapping:
+    args:
+      baseUri:
+        $concat:
+          - https://
+          - $var: credentials.domain
+      headers:
+        Authorization:
+          $concat:
+            - 'Bearer '
+            - $var: credentials.access_token
+test:
+  type: javascript
+  code: |
+    import { BadRequestError } from '@integration-app/sdk'
+
+    export default async function test({ apiClient }) {
+      const response = await apiClient.post('/graphql', {
+        query: '{ currentUser { id email name } }',
+      })
+      const user = response?.data?.currentUser
+      if (!user?.id) {
+        throw new BadRequestError(
+          'Failed to retrieve current user. Verify the domain and access token.',
+        )
+      }
+      return true
+    }
+options:
+  oauth:
+    type: oauth2
+    inputSchema:
+      type: object
+      properties:
+        domain:
+          title: Domain
+          description: >-
+            Your Frontify domain — typically `mycompany.frontify.com`, or your
+            custom domain (e.g. `brand.example.com`) if your Frontify account is
+            configured with one. Do not include `https://` or a trailing path.
+          type: string
+      required:
+        - domain
+    parametersSchema:
+      description: >-
+        Register an OAuth application in your Frontify workspace under **Account
+        Settings → Developer → Applications**.
+      type: object
+      properties:
+        clientId:
+          title: Client ID
+          type: string
+        clientSecret:
+          title: Client Secret
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - basic:read
+              - basic:write
+              - webhooks:read
+              - webhooks:write
+            allowCustom: true
+          default:
+            - basic:read
+      required:
+        - clientId
+        - clientSecret
+    getOAuthConfig:
+      type: javascript
+      code: |
+        export default async function getOAuthConfig({
+          connectorParameters: { clientId, clientSecret, scopes },
+          connectionParameters: { domain },
+        }) {
+          return {
+            clientId,
+            clientSecret,
+            authorizeUri: `https://${domain}/api/oauth/authorize`,
+            tokenUri: `https://${domain}/api/oauth/accesstoken`,
+            scopes: scopes ?? ['basic:read'],
+          }
+        }
+    ui:
+      schema:
+        type: object
+        properties:
+          domain:
+            title: Domain
+            description: >-
+              Your Frontify domain — typically `mycompany.frontify.com`, or your
+              custom domain (e.g. `brand.example.com`) if your Frontify account
+              is configured with one. Do not include `https://` or a trailing
+              path.
+            type: string
+        required:
+          - domain
+      helpUri: https://developer.frontify.com/
+    title: OAuth 2.0
+  api-token:
+    type: client-credentials
+    inputSchema:
+      description: >-
+        Generate a personal access token in your Frontify workspace at **Account
+        Settings → Personal Access Tokens**, then enter your domain and the
+        token below.
+      type: object
+      properties:
+        domain:
+          title: Domain
+          description: >-
+            Your Frontify domain — typically `mycompany.frontify.com`, or your
+            custom domain (e.g. `brand.example.com`). Do not include `https://`
+            or a trailing path.
+          type: string
+        access_token:
+          title: Personal Access Token
+          type: string
+      required:
+        - domain
+        - access_token
+    ui:
+      helpUri: >-
+        https://developer.frontify.com/d/XFPCrGNrXQYL/api-reference#/getting-started/quick-start-for-using-the-frontify-api
+    title: Personal Access Token
+uuid: 7ea01002-f89c-47c2-96db-c34b6f0734c7
+externalAppUuid: 4c0225c4-1afa-4e52-89dc-fa1b6bd75dcc

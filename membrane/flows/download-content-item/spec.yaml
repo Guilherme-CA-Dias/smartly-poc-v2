@@ -1,13 +1,8 @@
-id: 67e3ec62e1bedcd237b0db0b
-name: Download Content Item
 uuid: 7e4bebe8-e831-45bc-a391-d86f04b802c0
 key: download-content-item
-state: READY
-errors: []
-revision: d6d9ea4b-00b9-4570-b05d-a592aaa9cd07
-createdAt: '2025-03-26T12:00:34.475Z'
-updatedAt: '2025-03-26T12:46:46.455Z'
-isDeactivated: false
+name: Download Content Item
+isCustomized: false
+isUniversal: true
 nodes:
   api-trigger:
     type: api-trigger
@@ -18,8 +13,20 @@ nodes:
         properties:
           documentId:
             type: string
+    inputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+    outputSchema:
+      type: object
+      properties:
+        documentId:
+          type: string
+      title: API Trigger
     links:
       - key: download-file-or-markdown
+    dependencies: []
   api-request-to-your-app:
     type: api-request-to-your-app
     name: API Request to Your App
@@ -36,7 +43,18 @@ nodes:
             $var: $.connection.id
           downloadURI:
             $var: $.input.download-file-or-markdown.downloadURI
+    outputSchema:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            data: {}
+      title: API Request to Your App
     links: []
+    dependencies: []
   download-file-or-markdown:
     type: run-action
     name: Download file or markdown
@@ -46,7 +64,15 @@ nodes:
       input:
         id:
           $var: $.input.api-trigger.documentId
+    outputSchema:
+      type: object
+      properties:
+        downloadURI:
+          type: string
+        content:
+          type: string
+      title: Download file or markdown
     links:
       - key: api-request-to-your-app
-autoCreateInstances: false
-isCustomized: false
+    dependencies: []
+autoCreateInstances: true

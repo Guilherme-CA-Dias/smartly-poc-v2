@@ -1,8 +1,0 @@
-authorizeUri: https://account.box.com/api/oauth2/authorize
-tokenUri: https://api.box.com/oauth2/token
-clientId:
-  $var: $.connectorParameters.clientId
-clientSecret:
-  $var: $.connectorParameters.clientSecret
-scopes:
-  $var: $.connectorParameters.scopes

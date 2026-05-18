@@ -1,85 +1,163 @@
-# Content Import Example
+# Content Import App
 
-This is an application showcasing how you can implement Importing Content and Files into a knowledge base using [Integration.app](https://integration.app). The app is built with Next.js/React.
+A Next.js application that imports content from third-party integrations (Google Drive, Dropbox, Box, etc.) into a knowledge base using [Membrane](https://getmembrane.com) (powered by Integration.app).
 
-[Demo](https://content-import-example.vercel.app/)
+---
+
+## How it works
+
+### 1. Customer setup (Overview page)
+
+On first load, the app generates a random customer ID stored in localStorage. This ID is used to generate a signed JWT that authenticates the current user with Membrane.
+
+Before connecting any integration, the user must enter their **Internal API credentials** on the overview page:
+
+| Field | Purpose |
+|---|---|
+| `AWS_ACCESS_KEY_ID` | S3 access key |
+| `AWS_SECRET_ACCESS_KEY` | S3 secret key |
+| `AWS_REGION` | S3 region |
+| `ENDPOINT_URL` | Your internal API base URL |
+| `LIBRARY_ID` | Target library for imported content |
+
+These credentials are stored in localStorage and passed to the Membrane SDK on initialization, so Membrane can authenticate requests it makes to your internal API on the user's behalf.
+
+---
+
+### 2. Connecting an integration (Integrations page)
+
+The Integrations page lists all available integrations. Users can:
+
+- **Connect** an integration via OAuth or client credentials
+- **Browse** all available integrations via the pre-built Membrane embedded UI (`integrationApp.open()`)
+- **Manage flow instances** — enable or disable individual flows per integration via the Flows dialog
+- **View sync history** for each connected integration
+
+---
+
+### 3. Selecting and syncing documents
+
+Once an integration is connected, clicking **Select Files** opens a document picker that fetches the folder/file tree from the integration. The user selects which documents to sync and clicks **Sync**.
+
+This triggers two parallel background operations:
+
+**a) Document metadata sync**
+
+A sync record is created in MongoDB with status `in_progress`. A background job (`syncDocuments`) then:
+1. Fetches each selected document (and its children if it's a folder) via the Membrane SDK
+2. Saves all document metadata to MongoDB via bulk upsert
+3. Updates the sync record to `completed` (or `failed` after 3 retries with exponential backoff)
+
+**b) Flow runs**
+
+For each selected document, a `download-content-item` flow run is triggered via the Membrane API:
+
+```
+POST /flows/download-content-item/run?layer=connection&integrationKey={key}
+{ "input": { "documentId": "..." } }
+```
+
+One request per document, all fired in parallel. This tells Membrane to download the actual file content and deliver it to your internal API.
+
+---
+
+### 4. Webhook events
+
+Membrane calls your app's webhooks when content changes:
+
+- **`/api/webhooks/on-create`** — new document detected, triggers a `download-content-item` flow run
+- **`/api/webhooks/on-update`** — document updated, re-triggers the download flow
+- **`/api/webhooks/on-delete`** — document deleted, removes it from MongoDB
+- **`/api/webhooks/on-download-complete`** — Membrane has finished downloading; the app extracts text and stores the result in S3
+
+---
+
+## Architecture
+
+```
+Browser (localStorage: customerId, credentials)
+  │
+  ├── x-auth-id / x-customer-name / x-credentials headers
+  │
+Next.js API routes
+  ├── Generate JWT (workspace key + secret)
+  ├── IntegrationAppClient({ token, credentials })  ← credentials injected here
+  └── MongoDB (sync records, document metadata)
+        │
+        └── S3 (extracted text content)
+```
+
+---
 
 ## Prerequisites
 
 - Node.js 18+
-- Integration.app workspace credentials (Workspace Key and Secret). [Get credentials](https://console.integration.app/settings/workspace) from the workspace settings.
-- MongoDB connection string (We provide a docker-compose file to spin up a local MongoDB instance. See [Using mongodb via Docker](#using-mongodb-via-docker) for more details.)
-- AWS credentials (for S3)
+- Membrane workspace credentials (Workspace Key and Secret) — [get them here](https://console.integration.app/settings/workspace)
+- MongoDB connection string
+- AWS S3 credentials
+
+---
 
 ## Setup
 
-### 1. **Clone repository & Install dependencies:**
+### 1. Install dependencies
 
 ```bash
 npm install
-# or
-yarn install
 ```
 
-### 2. **Set up environment variables file:**
+### 2. Configure environment variables
 
 ```bash
-# Copy the sample environment file
 cp .env-sample .env
 ```
 
-### 3. **Add your credentials to the `.env` file:**
+Fill in `.env`:
 
-> Note: The following credentials are optional but enable additional features:
+```env
+# Membrane / Integration.app
+INTEGRATION_APP_WORKSPACE_KEY=
+INTEGRATION_APP_WORKSPACE_SECRET=
 
-- **AWS S3**: Enables file download and storage in S3
-- **Unstructured.io**: Enables text extraction from PDFs, Word documents, and other file formats
+# MongoDB
+MONGODB_URI=
 
-### 4. **Add the Scenario to Your Workspace:**
+# AWS S3
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=us-east-2
+AWS_BUCKET_NAME=
 
-This application relies on predefined [flows](https://console.integration.app/docs/building/blocks/flows), [actions](https://console.integration.app/docs/building/blocks/actions), and other primitives, all organized within a **Scenario template**
+# Internal API (can also be set per-user via the Overview page UI)
+ENDPOINT_URL=
+LIBRARY_ID=
+```
 
-To use the same flows and actions in your workspace, navigate to the [Continuously Import Content to My App Scenario](https://integration.app/scenarios/continuously-import-content-to-my-app) and click the **"Add to App"** button. This will add the required flows and actions, data sources and other primitives to your workspace.
+### 3. Add the scenario to your workspace
 
-### 5. Configure your apps
+This app relies on predefined flows and actions. Navigate to the [Continuously Import Content to My App scenario](https://integration.app/scenarios/continuously-import-content-to-my-app) and click **Add to App**.
 
-The [Continuously Import Content to My App Scenario](https://integration.app/scenarios/continuously-import-content-to-my-app) adds **8 apps** to your workspace and for most apps to work, you'll need to provide configuration parameters. The configuration guide for each apps explains how to get the credentials needed. See video below for an overview of the configuration process:
-
-https://github.com/user-attachments/assets/272197b4-aea9-40ff-a444-ac0fa17f672f
-
-### 6. **Start the development server:**
+### 4. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Using mongodb via Docker
+---
 
-### Prerequisites
-
-- Docker and Docker Compose installed on your machine
-
-### Setting up MongoDB
-
-If you want to use MongoDB via Docker, you can do so by running the following command:
+## MongoDB via Docker
 
 ```bash
 docker-compose up
 ```
 
-You can now use the `MONGODB_URI` environment variable to connect to the database:
-
 ```env
 MONGODB_URI=mongodb://admin:password123@localhost:27017/knowledge
 ```
 
-## Todos
-
-- [ ] Get events working for all apps
+---
 
 ## License
 

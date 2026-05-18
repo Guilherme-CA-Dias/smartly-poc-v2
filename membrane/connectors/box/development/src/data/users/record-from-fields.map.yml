@@ -1,8 +1,0 @@
-id:
-  $var: $.fields.id
-name:
-  $var: $.fields.name
-createdTime:
-  $var: $.fields.created_at
-updatedTime:
-  $var: $.fields.modified_at

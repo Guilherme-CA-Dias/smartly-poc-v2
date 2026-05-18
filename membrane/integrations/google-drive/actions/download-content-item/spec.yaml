@@ -1,16 +1,7 @@
-id: 67e3ec73855bfa3388cd6d94
-name: Download Content Item
-uuid: 61bfa4cf-7cb0-4a34-bcb4-2a25f733d326
+uuid: b544cf13-b271-4edc-8156-9055ba244ada
 key: download-content-item
-state: READY
-errors: []
-revision: 7cc23dcd-21cf-4003-b84f-4e422aa3ce9e
-createdAt: '2025-03-26T12:00:51.095Z'
-updatedAt: '2025-10-13T07:15:51.267Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67974ac4d59680b518ef328e
-parentId: 67e3ec5d124af3a6b1469421
+name: Download Content Item
+isCustomized: true
 inputSchema:
   type: object
   properties:
@@ -27,42 +18,6 @@ config:
 outputMapping:
   downloadURI:
     $var: $.output.downloadUri
-isCustomized: true
-outputSchema:
-  type: object
-  properties:
-    downloadURI:
-      type: string
-defaultOutputSchema:
-  type: object
-  properties:
-    downloadUri:
-      type: string
-  required:
-    - downloadUri
-integration:
-  id: 67974ac4d59680b518ef328e
-  name: Google Drive
-  uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
-  key: google-drive
-  state: READY
-  errors: []
-  revision: d233deab-48bf-4974-a5a5-8c158e34a083
-  createdAt: '2025-01-27T08:58:44.490Z'
-  updatedAt: '2025-10-16T14:59:26.572Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/gdrive/logo.png
-  connectorId: 642e822e986ed1caad090f1d
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 51
-  hasData: true
-  dataCollectionsCount: 3
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-  authType: oauth2
+parentUuid: a8ad6853-9087-4c80-bcb5-e0c79ee7a0bc
+integrationUuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

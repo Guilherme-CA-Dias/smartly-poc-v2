@@ -1,0 +1,21 @@
+uuid: cc195932-8689-404e-9ff0-4db5af68eaae
+key: find-content-item-by-id
+name: Find Content Item By Id
+isCustomized: false
+isUniversal: true
+inputSchema:
+  type: object
+  properties:
+    id:
+      type: string
+type: find-data-record-by-id
+config:
+  dataSource:
+    key: content-items
+  id:
+    $var: $.input.id
+  fieldMapping:
+    key: content-items
+parentUuid: 0137298b-20bf-4fe0-aaae-4aca61190f10
+integrationUuid: 84ae8bef-244c-47cd-8c65-30f4edd63eb8
+externalAppUuid: 82c0be67-b359-43db-a925-5d9fcda9743f

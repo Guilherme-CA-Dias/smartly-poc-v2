@@ -1,16 +1,8 @@
-id: 67e3ec7dc5ee3b01289e49f5
-name: Find Content Item By Id
-uuid: c49dbd3b-17f8-4895-ae77-124d42e16132
+uuid: 57d1b070-9e11-4836-a603-a86c08b26484
 key: find-content-item-by-id
-state: READY
-errors: []
-revision: 2b0b9139-973e-4dea-b174-23bccc13e5fa
-createdAt: '2025-03-26T12:01:01.474Z'
-updatedAt: '2025-10-13T07:15:51.330Z'
-archivedAt: null
-isDeactivated: false
-integrationId: 67974ac4d59680b518ef328e
-parentId: 67e3ec5ea77e96adf253943a
+name: Find Content Item By Id
+isCustomized: false
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -24,130 +16,6 @@ config:
     $var: $.input.id
   fieldMapping:
     key: content-items
-isCustomized: false
-outputSchema:
-  type: object
-  properties:
-    id:
-      type: string
-    name:
-      type: string
-    uri:
-      type: string
-      format: url
-    createdTime:
-      type: string
-      format: datetime
-    updatedTime:
-      type: string
-      format: datetime
-    deletedTime:
-      type: string
-      format: datetime
-    createdById:
-      type: string
-    updatedById:
-      type: string
-    fields:
-      type: object
-      properties:
-        id:
-          title: Id
-          type: string
-        title:
-          title: Title
-          type: string
-        createdAt:
-          title: Created At
-          type: string
-        updatedAt:
-          title: Updated At
-          type: string
-        parentId:
-          title: Parent Id
-          type: string
-        canHaveChildren:
-          title: Can Have Children
-          type: boolean
-        resourceURI:
-          title: Resource Uri
-          type: string
-        canDownload:
-          title: Can Download
-          type: boolean
-defaultOutputSchema:
-  type: object
-  properties:
-    id:
-      type: string
-    name:
-      type: string
-    uri:
-      type: string
-      format: url
-    createdTime:
-      type: string
-      format: datetime
-    updatedTime:
-      type: string
-      format: datetime
-    deletedTime:
-      type: string
-      format: datetime
-    createdById:
-      type: string
-    updatedById:
-      type: string
-    fields:
-      type: object
-      properties:
-        id:
-          title: Id
-          type: string
-        title:
-          title: Title
-          type: string
-        createdAt:
-          title: Created At
-          type: string
-        updatedAt:
-          title: Updated At
-          type: string
-        parentId:
-          title: Parent Id
-          type: string
-        canHaveChildren:
-          title: Can Have Children
-          type: boolean
-        resourceURI:
-          title: Resource Uri
-          type: string
-        canDownload:
-          title: Can Download
-          type: boolean
-integration:
-  id: 67974ac4d59680b518ef328e
-  name: Google Drive
-  uuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
-  key: google-drive
-  state: READY
-  errors: []
-  revision: d233deab-48bf-4974-a5a5-8c158e34a083
-  createdAt: '2025-01-27T08:58:44.490Z'
-  updatedAt: '2025-10-16T14:59:26.572Z'
-  isDeactivated: false
-  logoUri: https://static.integration.app/connectors/gdrive/logo.png
-  connectorId: 642e822e986ed1caad090f1d
-  connectorVersion: 3.0.0
-  hasMissingParameters: false
-  hasDocumentation: true
-  hasOperations: true
-  operationsCount: 51
-  hasData: true
-  dataCollectionsCount: 3
-  hasEvents: false
-  eventsCount: 0
-  hasGlobalWebhooks: false
-  hasUdm: true
-  appUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa
-  authType: oauth2
+parentUuid: 0137298b-20bf-4fe0-aaae-4aca61190f10
+integrationUuid: 272b82c8-0690-4ff2-8f5b-00685cef8d5d
+externalAppUuid: a7d76105-5a82-4cd2-be0e-d459f71a9bfa

@@ -1,12 +1,9 @@
-id: 67e3ec616446443b8d435553
-name: Content Items
 uuid: 7b611865-b3ca-4ff9-8fd6-54523fceb729
 key: content-items
-revision: 130c883d-3f52-4121-87cc-57ad07e8b316
-createdAt: '2025-03-26T12:00:33.665Z'
-updatedAt: '2025-03-26T14:02:18.005Z'
-isDeactivated: false
-dataSourceId: 67e3ec6017681d248899a06f
+name: Content Items
+isCustomized: true
+isUniversal: true
+dataSourceKey: content-items
 appSchema:
   type: object
   properties:
@@ -44,5 +41,4 @@ defaultImportValue:
     $var: $.uri
   isDownloadable:
     $var: $.isDownloadable
-isCustomized: true
-dataSourceKey: content-items
+dataSourceUuid: 3a2d0282-7d2c-4d45-9397-b91933884da7

@@ -1,13 +1,8 @@
-id: 67e3ec5fe1bedcd237b0dae8
-name: List Content Items
-uuid: 9111c16b-0d0d-4974-8b47-24a3bf1e7a90
+uuid: 5bfcf935-bb7d-48d2-8d65-831d162b4698
 key: list-content-items
-state: READY
-errors: []
-revision: 1636be74-f43b-4bf8-b7a0-8feab1b36355
-createdAt: '2025-03-26T12:00:31.191Z'
-updatedAt: '2025-10-13T11:09:26.242Z'
-isDeactivated: false
+name: List Content Items
+isCustomized: true
+isUniversal: true
 inputSchema:
   type: object
   properties:
@@ -21,68 +16,3 @@ config:
     key: content-items
   cursor:
     $var: $.input.cursor
-isCustomized: true
-outputSchema:
-  type: object
-  properties:
-    cursor:
-      type: string
-    records:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: string
-          name:
-            type: string
-          uri:
-            type: string
-            format: url
-          createdTime:
-            type: string
-            format: datetime
-          updatedTime:
-            type: string
-            format: datetime
-          deletedTime:
-            type: string
-            format: datetime
-          createdById:
-            type: string
-          updatedById:
-            type: string
-          fields:
-            type: object
-defaultOutputSchema:
-  type: object
-  properties:
-    cursor:
-      type: string
-    records:
-      type: array
-      items:
-        type: object
-        properties:
-          id:
-            type: string
-          name:
-            type: string
-          uri:
-            type: string
-            format: url
-          createdTime:
-            type: string
-            format: datetime
-          updatedTime:
-            type: string
-            format: datetime
-          deletedTime:
-            type: string
-            format: datetime
-          createdById:
-            type: string
-          updatedById:
-            type: string
-          fields:
-            type: object

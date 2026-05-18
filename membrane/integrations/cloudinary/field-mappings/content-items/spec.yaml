@@ -1,0 +1,46 @@
+uuid: a0138da4-4448-4e72-816f-5f446d9d53d9
+key: content-items
+name: Content Items
+isCustomized: false
+dataSourceKey: content-items
+appSchema:
+  type: object
+  properties:
+    id:
+      type: string
+    title:
+      type: string
+    createdAt:
+      type: string
+    updatedAt:
+      type: string
+    parentId:
+      type: string
+    canHaveChildren:
+      type: boolean
+    resourceURI:
+      type: string
+    canDownload:
+      type: boolean
+direction: import
+defaultImportValue:
+  id:
+    $var: $.id
+  title:
+    $var: $.title
+  createdAt:
+    $var: $.createdTime
+  updatedAt:
+    $var: $.updatedTime
+  parentId:
+    $var: $.parentDocumentId
+  canHaveChildren:
+    $var: $.canHaveChildren
+  resourceURI:
+    $var: $.uri
+  isDownloadable:
+    $var: $.isDownloadable
+parentUuid: 7b611865-b3ca-4ff9-8fd6-54523fceb729
+integrationUuid: aa466028-08f9-4868-921d-21b3716cb69f
+externalAppUuid: 3c4f26e0-7536-456e-8d71-ee38ec718768
+dataSourceUuid: 3fe2af60-c86e-4381-ad99-72106e921a42

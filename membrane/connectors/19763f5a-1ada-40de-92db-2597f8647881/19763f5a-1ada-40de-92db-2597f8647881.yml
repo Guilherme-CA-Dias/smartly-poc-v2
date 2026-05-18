@@ -1,0 +1,177 @@
+key: box
+name: Box
+logoUri: https://static.integration.app/connectors/box/logo.png
+categories:
+  - File Storage
+parametersSchema:
+  type: object
+  description: >-
+    ## Get a Developer account
+
+
+    To be able to create your own Box application, you'll need to either sign up
+    for a free-tier Box account (this can be done from the main page at
+    [box.com](https://www.box.com/)) or sign up for an [Enterprise Developer
+    account](https://support.box.com/hc/en-us/articles/4636662134803-Creating-Your-Developer-Account)
+    should you already be paying for a Box account.
+
+
+    ## Create an oauth app
+
+
+    A step-by-step guide on how to create a Box application here:
+    [https://support.box.com/hc/en-us/articles/4636617907731-Creating-Your-First-Application](https://support.box.com/hc/en-us/articles/4636617907731-Creating-Your-First-Application).
+
+
+    Once you've got your Box account, you'll need to create an oauth app. This
+    can be done from the Box Developer Console
+    [here](https://app.box.com/developers/console). The following pieces of
+    information needs to be filled in before you can move on:
+
+
+    - application type: **Custom App**
+
+    - authentication method: **User Authentication (OAuth 2.0)**
+
+    - a name for your custom app
+
+
+    ## Get OAuth credentials
+
+
+    Once you've hit **Create App** you can further customize your application
+    from the **Configuration** tab. To ensure the flawlessness of the
+    integration with the `box-connector`, you need to:
+
+
+    - copy and save somewhere safe **Client ID** and **Client Secret** values of
+    **OAuth 2.0 Credentials**
+
+    - set `https://api.getmembrane.com/oauth-callback` as the **OAuth 2.0
+    Redirect URI**
+
+    - select `Manage Webhooks`, `Read all files and folders` and `Write all
+    files and folders` **Application Scopes**
+
+
+    ## Configure the app parameters in the getmembrane.com platform
+
+
+    - Add the **Box** app from store in the Getmembrane.com
+    [console](https://console.getmembrane.com/)
+
+    - Click **Configure & Test**
+
+    - Select **Parameters** / **Edit Parameters**
+
+    - Fill in the **Client Id** and the **Client Secret** values (you should've
+    saved them earlier)
+
+    - Click **Save**
+
+
+    ## Configure Webhooks
+
+
+    Box offers a mechanism of subscription to changes that occur with user's
+    content (files/folders). To be able to receive events with these changes,
+    you may want to create an application webhook like so:
+
+
+    - go to the getmembrane.com [console](https://console.getmembrane.com/) =>
+    External Apps => Box => Configure & Test and copy the **Global Webhooks**
+    url <img height="135" width="671" alt="global webhooks"
+    src="https://static.getmembrane.com/connectors/box/asset-b9816d39-61ff-4eb0-b51e-bf4f5f844ed6.png"
+    />
+
+    - from the Box developers console, go to **Webhooks/V1 Webhooks**
+
+    - click Create Webhook and choose V1 from the dropdown list
+
+    - check `Created`, `Uploaded`, `Deleted` event types in the **Event
+    Triggers** section
+
+    - paste the Global Webhooks url you saved earlier into the **Endpoint URL**
+    field and select **REST** as a payload format
+
+    - add the following Callback Parameters <img height="506" width="558"
+    alt="callback parameters"
+    src="https://static.getmembrane.com/connectors/box/asset-b5a48b3f-ea61-40a9-97e1-1242b4d93a9a.png"
+    />
+
+    - save the webhook
+test:
+  type: rest-api-mapping
+  mapping:
+    path: /users/me
+    method: get
+    responseMapping: true
+options:
+  auth-proxy:
+    type: proxy
+    proxyKey: box
+    title: proxy
+    enabled:
+      $eval:
+        $var: $.connectorParameters.clientId
+      isEmpty: true
+  oauth2:
+    type: oauth2
+    parametersSchema:
+      description: >-
+        Create a Custom App in the [Box Developer
+        Console](https://app.box.com/developers/console) using OAuth 2.0
+        authentication to obtain your Client ID and Client Secret.
+      type: object
+      properties:
+        clientId:
+          title: Client ID
+          type: string
+        clientSecret:
+          title: Client Secret
+          type: string
+        scopes:
+          type: array
+          items:
+            type: string
+            enum:
+              - root_readwrite
+              - manage_managed_users
+              - manage_groups
+              - manage_webhook
+              - manage_enterprise_properties
+              - manage_data_retention
+              - enterprise_content
+              - sign_requests.readwrite
+              - manage_triggers
+            allowCustom: true
+          default:
+            - root_readwrite
+            - manage_managed_users
+            - manage_webhook
+      required:
+        - clientId
+        - clientSecret
+    makeApiClient:
+      type: mapping
+      mapping:
+        baseUri: https://api.box.com/2.0
+        headers:
+          authorization:
+            $concat:
+              - 'Bearer '
+              - $var: credentials.access_token
+    getOAuthConfig:
+      type: mapping
+      mapping:
+        authorizeUri: https://account.box.com/api/oauth2/authorize
+        tokenUri: https://api.box.com/oauth2/token
+        clientId:
+          $var: $.connectorParameters.clientId
+        clientSecret:
+          $var: $.connectorParameters.clientSecret
+        scopes:
+          $var: $.connectorParameters.scopes
+    title: OAuth2
+uuid: 19763f5a-1ada-40de-92db-2597f8647881
+externalAppUuid: 280cb7a1-8636-4950-bf53-3b1ef5fb5f44

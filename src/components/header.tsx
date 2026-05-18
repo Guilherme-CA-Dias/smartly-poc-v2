@@ -30,10 +30,11 @@ export function Header() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Image
-                src="/logo.svg"
-                alt="Logo"
+                src="/membrane-icon.png"
+                alt="Membrane"
                 width={32}
                 height={32}
+                className="invert"
               />
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

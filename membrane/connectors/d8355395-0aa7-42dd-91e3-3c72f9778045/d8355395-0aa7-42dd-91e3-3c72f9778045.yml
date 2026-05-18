@@ -1,0 +1,170 @@
+key: aws-s3-compatible
+name: AWS S3 Compatible
+logoUri: >-
+  https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Amazon-S3-Logo.svg/1280px-Amazon-S3-Logo.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail
+categories: []
+type: client-credentials
+inputSchema:
+  description: >-
+    Connect to AWS S3 or S3-compatible services (MinIO, DigitalOcean Spaces,
+    etc.). For S3-compatible services, provide the endpoint URL.
+  type: object
+  properties:
+    AWS_ACCESS_KEY_ID:
+      title: Access Key ID
+      description: Your AWS Access Key ID
+      type: string
+    AWS_SECRET_ACCESS_KEY:
+      title: Secret Access Key
+      description: Your AWS Secret Access Key
+      type: string
+      isSensitive: true
+    AWS_REGION:
+      title: Region (Optional)
+      description: >-
+        AWS region (e.g., us-east-1, eu-west-1). Defaults to us-east-1 if not
+        specified.
+      type: string
+    ENDPOINT_URL:
+      title: Endpoint URL (Optional)
+      description: >-
+        For S3-compatible services, provide the endpoint URL (e.g.,
+        https://minio.example.com or https://nyc3.digitaloceanspaces.com). Leave
+        empty for AWS S3.
+      type: string
+    LIBRARY_ID:
+      title: Library ID
+      description: Your Library ID for organizing and managing resources
+      type: string
+  required:
+    - AWS_ACCESS_KEY_ID
+    - AWS_SECRET_ACCESS_KEY
+makeApiClient:
+  type: javascript
+  code: |
+    import { RestApiClient } from '@integration-app/connector-sdk'
+    import crypto from 'crypto'
+    import { URL } from 'url'
+
+    export default async function makeAPIClient({ credentials }) {
+      function getHeaders({ method, path, query, data }) {
+        // Determine the base URI
+        let baseUri
+        let region = credentials.AWS_REGION || 'us-east-1'
+        
+        if (credentials.ENDPOINT_URL) {
+          // Custom S3-compatible endpoint
+          baseUri = credentials.ENDPOINT_URL.replace(/\/$/, '') // Remove trailing slash
+        } else {
+          // Default AWS S3 endpoint
+          baseUri = `https://s3.${region}.amazonaws.com`
+        }
+        
+        const url = new URL(path, baseUri)
+        const pathName = url.pathname
+        const host = url.host
+
+        const amzdate = new Date().toISOString().replace(/[:\-]|\.\d{3}/g, '')
+        const datestamp = amzdate.slice(0, 8)
+        
+        // Convert the query object to a query string
+        let queryString = ''
+        if (query) {
+          queryString = Object.entries(query)
+            .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+            .map(
+              ([key, value]) =>
+                `${encodeURIComponent(key)}=${encodeURIComponent(value)}`,
+            )
+            .join('&')
+        }
+
+        const canonicalHeaders = `host:${host}\nx-amz-date:${amzdate}\n`
+        const signedHeaders = 'host;x-amz-date'
+
+        const payloadHash = crypto
+          .createHash('sha256')
+          .update(data ?? '', 'utf8')
+          .digest('hex')
+        const canonicalRequest = `${method}\n${pathName}\n${queryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
+
+        // String to sign
+        const algorithm = 'AWS4-HMAC-SHA256'
+        const credentialScope = `${datestamp}/${region}/s3/aws4_request`
+        const stringToSign = `${algorithm}\n${amzdate}\n${credentialScope}\n${crypto
+          .createHash('sha256')
+          .update(canonicalRequest, 'utf8')
+          .digest('hex')}`
+
+        // Signing key
+        const kDate = crypto
+          .createHmac('sha256', `AWS4${credentials.AWS_SECRET_ACCESS_KEY}`)
+          .update(datestamp, 'utf8')
+          .digest()
+        const kRegion = crypto
+          .createHmac('sha256', kDate)
+          .update(region, 'utf8')
+          .digest()
+        const kService = crypto
+          .createHmac('sha256', kRegion)
+          .update('s3', 'utf8')
+          .digest()
+        const kSigning = crypto
+          .createHmac('sha256', kService)
+          .update('aws4_request', 'utf8')
+          .digest()
+
+        // Signature
+        const signature = crypto
+          .createHmac('sha256', kSigning)
+          .update(stringToSign, 'utf8')
+          .digest('hex')
+
+        // Authorization header
+        const authorizationHeader = `${algorithm} Credential=${credentials.AWS_ACCESS_KEY_ID}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
+
+        return {
+          baseUri,
+          headers: {
+            'x-amz-date': amzdate,
+            'x-amz-content-sha256': payloadHash,
+            Authorization: authorizationHeader,
+          },
+        }
+      }
+
+      return new RestApiClient({
+        dynamicOptions: getHeaders,
+      })
+    }
+test:
+  type: javascript
+  code: |
+    export default async function test({ externalApiClient, credentials }) {
+      try {
+        // Determine the base URI for the test
+        let baseUri
+        const region = credentials.AWS_REGION || 'us-east-1'
+        
+        if (credentials.ENDPOINT_URL) {
+          baseUri = credentials.ENDPOINT_URL.replace(/\/$/, '')
+        } else {
+          baseUri = `https://s3.${region}.amazonaws.com`
+        }
+        
+        // Try to list buckets - this is a simple operation that validates credentials
+        const response = await externalApiClient.get('/')
+        
+        // If we get a successful response, credentials are valid
+        return response && response.status !== 403 && response.status !== 401
+      } catch (error) {
+        // If it's an auth error, credentials are invalid
+        if (error.response && (error.response.status === 403 || error.response.status === 401)) {
+          return false
+        }
+        // For other errors, we assume credentials might be valid but endpoint is unreachable
+        // This is acceptable for S3-compatible services that might have different response formats
+        return true
+      }
+    }
+uuid: d8355395-0aa7-42dd-91e3-3c72f9778045

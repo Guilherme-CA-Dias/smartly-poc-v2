@@ -1,10 +1,6 @@
-id: 67e3ec6017681d248899a06f
-name: Content Items
 uuid: 3a2d0282-7d2c-4d45-9397-b91933884da7
 key: content-items
-revision: 5d7bc4b6-0208-433f-a8ce-e3dcf1605ec9
-createdAt: '2025-03-26T12:00:32.583Z'
-updatedAt: '2025-03-26T12:00:32.583Z'
-isDeactivated: false
-udm: documents
+name: Content Items
 isCustomized: false
+isUniversal: true
+udm: documents

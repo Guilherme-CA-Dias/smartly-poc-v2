@@ -8,11 +8,8 @@ import { Button } from "./ui/button";
 import type { AuthCredentials } from "@/lib/auth";
 
 const CREDENTIAL_FIELDS: { key: keyof AuthCredentials; label: string; secret?: boolean }[] = [
-  { key: "AWS_ACCESS_KEY_ID", label: "AWS Access Key ID" },
-  { key: "AWS_SECRET_ACCESS_KEY", label: "AWS Secret Access Key", secret: true },
-  { key: "AWS_REGION", label: "AWS Region" },
-  { key: "ENDPOINT_URL", label: "Endpoint URL" },
-  { key: "LIBRARY_ID", label: "Library ID" },
+  { key: "libraryId", label: "Library Id" },
+  { key: "apiToken", label: "Api Token", secret: true },
 ];
 
 export function AuthTest() {

@@ -16,9 +16,8 @@ export default function HomePage() {
               Content Import Example
             </h1>
             <p className="text-muted-foreground">
-              This app uses{" "}
-              <Link href="https://integration.app">Integration.app</Link> to
-              fetch data from different sources and update subscribed content
+              This app uses <Link href="https://integration.app">Membrane</Link>{" "}
+              to fetch data from different sources and update subscribed content
               when changes are detected.
             </p>
           </div>

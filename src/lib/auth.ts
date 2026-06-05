@@ -5,11 +5,8 @@ const CUSTOMER_NAME_KEY = 'integration_customer_name';
 const CREDENTIALS_KEY = 'integration_credentials';
 
 export type AuthCredentials = {
-  AWS_ACCESS_KEY_ID?: string;
-  AWS_SECRET_ACCESS_KEY?: string;
-  AWS_REGION?: string;
-  ENDPOINT_URL?: string;
-  LIBRARY_ID?: string;
+  libraryId?: string;
+  apiToken?: string;
 };
 
 export type AuthCustomer = {

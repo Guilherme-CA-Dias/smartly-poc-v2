@@ -7,6 +7,7 @@ import { FolderOpen, Zap } from "lucide-react";
 import { DocumentPicker } from "@/app/integrations/components/document-picker";
 import { SyncHistoryModal } from "@/app/integrations/components/sync-history-modal";
 import { FlowInstancesModal } from "@/app/integrations/components/flow-instances-modal";
+import { SmartlyFilesPicker } from "@/app/integrations/components/smartly-files-picker";
 import { getAuthHeaders } from "@/app/auth-provider";
 import Image from "next/image";
 import { useIntegrationApp } from "@integration-app/react";
@@ -31,6 +32,7 @@ export function IntegrationListItem({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isFlowsOpen, setIsFlowsOpen] = useState(false);
+  const [isSmartlyOpen, setIsSmartlyOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
@@ -151,6 +153,12 @@ export function IntegrationListItem({
         onOpenChange={setIsHistoryOpen}
       />
 
+      <SmartlyFilesPicker
+        integration={integration}
+        open={isSmartlyOpen}
+        onOpenChange={setIsSmartlyOpen}
+      />
+
       <FlowInstancesModal
         connectionId={integration.connection?.id || ""}
         integrationKey={integration.key}
@@ -190,6 +198,15 @@ export function IntegrationListItem({
         <div className="flex items-center gap-2">
           {integration.connection ? (
             <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsSmartlyOpen(true)}
+                disabled={!integration.connection?.id}
+              >
+                <FolderOpen className="w-4 h-4 mr-2" />
+                Smartly Files
+              </Button>
               <Button
                 variant="outline"
                 size="sm"

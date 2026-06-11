@@ -31,6 +31,7 @@ import connectDB from "@/lib/mongodb";
 import { SyncModel, SyncStatus } from "@/models/sync";
 import { SyncEventData, SyncRequestBody, SyncRouteResponse } from "./types";
 import { syncDocuments } from "./syncDocuments";
+import { uploadDocsToSmartly } from "./uploadDocsToSmartly";
 import { DocumentModel } from "@/models/document";
 
 export async function POST(
@@ -39,7 +40,7 @@ export async function POST(
 ): Promise<NextResponse<SyncRouteResponse>> {
   try {
     const connectionId = (await params).integrationId;
-    const { integrationId, integrationKey, integrationName, integrationLogo, documentIds } =
+    const { integrationId, integrationKey, integrationName, integrationLogo, documentIds, smartlyDestinationPrefix } =
       (await request.json()) as SyncRequestBody;
 
     const auth = getAuthFromRequest(request);
@@ -48,6 +49,12 @@ export async function POST(
     await connectDB();
 
     const userId = auth.customerId;
+
+    const { libraryId, apiToken } = (auth.credentials ?? {}) as { libraryId?: string; apiToken?: string };
+    const smartlyUpload =
+      smartlyDestinationPrefix !== undefined && libraryId && apiToken
+        ? { destinationPrefix: smartlyDestinationPrefix, libraryId, apiToken }
+        : undefined;
 
     // Create a new sync record
     const sync = await SyncModel.create({
@@ -61,6 +68,7 @@ export async function POST(
       syncError: null,
       isTruncated: false,
       documentIds,
+      smartlyUpload,
     });
 
     const eventData = {
@@ -70,12 +78,23 @@ export async function POST(
       credentials: auth.credentials,
       documentIds,
       syncId: sync._id.toString(),
+      smartlyUpload,
     } satisfies SyncEventData;
 
     syncDocuments(eventData).catch(console.error);
 
     if (documentIds && documentIds.length > 0) {
       triggerFlowRuns(token, integrationKey, documentIds).catch(console.error);
+
+      if (smartlyUpload) {
+        uploadDocsToSmartly({
+          connectionId,
+          token,
+          credentials: auth.credentials,
+          documentIds,
+          ...smartlyUpload,
+        }).catch(console.error);
+      }
     }
 
     return NextResponse.json({ status: SyncStatus.in_progress });

@@ -31,12 +31,16 @@ interface SmartlyFilesPickerProps {
   integration: Integration;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode?: "browse" | "select-folder";
+  onSelectFolder?: (prefix: string) => void;
 }
 
 export function SmartlyFilesPicker({
   integration,
   open,
   onOpenChange,
+  mode = "browse",
+  onSelectFolder,
 }: SmartlyFilesPickerProps) {
   const connectionId = integration.connection?.id;
 
@@ -96,7 +100,9 @@ export function SmartlyFilesPicker({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Smartly Files</DialogTitle>
+          <DialogTitle>
+            {mode === "select-folder" ? "Choose Smartly destination" : "Smartly Files"}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="min-h-[400px] max-h-[400px] overflow-y-auto my-4">
@@ -168,18 +174,20 @@ export function SmartlyFilesPicker({
               <div className="space-y-1">
                 {folders.map((folder) => (
                   <div
-                    key={folder.key}
+                    key={folder.id}
                     className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 cursor-pointer rounded-xl"
                     onClick={() => navigateToFolder(folder)}
                   >
-                    <Checkbox
-                      checked={selected.has(folder.key)}
-                      onCheckedChange={() => toggleSelect(folder.key)}
-                      onClick={(e) => e.stopPropagation()}
-                    />
+                    {mode === "browse" && (
+                      <Checkbox
+                        checked={selected.has(folder.key)}
+                        onCheckedChange={() => toggleSelect(folder.key)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       <FolderIcon className="h-4 w-4 flex-shrink-0 text-gray-400" />
-                      <span className={cn("truncate", selected.has(folder.key) && "text-blue-600")}>
+                      <span className={cn("truncate", mode === "browse" && selected.has(folder.key) && "text-blue-600")}>
                         {folder.name}
                       </span>
                     </div>
@@ -187,9 +195,9 @@ export function SmartlyFilesPicker({
                   </div>
                 ))}
 
-                {files.map((file) => (
+                {mode === "browse" && files.map((file) => (
                   <div
-                    key={file.key}
+                    key={file.id}
                     className="flex items-center gap-3 py-2 px-4 hover:bg-gray-50 cursor-pointer rounded-xl"
                     onClick={() => toggleSelect(file.key)}
                   >
@@ -217,26 +225,54 @@ export function SmartlyFilesPicker({
         </div>
 
         <DialogFooter className="!flex !flex-row !items-center !justify-between">
-          <div className="text-sm text-gray-600">
-            {selected.size} {selected.size === 1 ? "item" : "items"} selected
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={sending}>
-              Close
-            </Button>
-            {selected.size > 0 && (
-              <Button onClick={handleSend} disabled={sending}>
-                {sending ? (
-                  <>
-                    <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
-                    Sending...
-                  </>
-                ) : (
-                  "Send"
+          {mode === "select-folder" ? (
+            <>
+              <div className="text-sm text-gray-500 truncate max-w-[260px]">
+                {breadcrumbs.length === 0
+                  ? "Root folder"
+                  : breadcrumbs[breadcrumbs.length - 1].name}
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    const prefix = breadcrumbs.length > 0
+                      ? breadcrumbs[breadcrumbs.length - 1].prefix
+                      : "";
+                    onSelectFolder?.(prefix);
+                    onOpenChange(false);
+                  }}
+                >
+                  Upload here
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm text-gray-600">
+                {selected.size} {selected.size === 1 ? "item" : "items"} selected
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => onOpenChange(false)} disabled={sending}>
+                  Close
+                </Button>
+                {selected.size > 0 && (
+                  <Button onClick={handleSend} disabled={sending}>
+                    {sending ? (
+                      <>
+                        <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      "Send"
+                    )}
+                  </Button>
                 )}
-              </Button>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

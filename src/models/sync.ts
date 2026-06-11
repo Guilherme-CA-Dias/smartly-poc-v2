@@ -8,6 +8,12 @@ export const SyncStatus = {
 
 export type SyncStatus = (typeof SyncStatus)[keyof typeof SyncStatus];
 
+export interface SmartlyUploadConfig {
+  destinationPrefix: string;
+  libraryId: string;
+  apiToken: string;
+}
+
 export interface Sync {
   userId: string;
   connectionId: string;
@@ -20,8 +26,9 @@ export interface Sync {
   syncError?: string;
   isTruncated?: boolean;
   retryCount?: number;
-  documentIds?: string[]; // Initially selected document IDs
-  actualSyncedDocumentIds?: string[]; // All document IDs that were actually synced
+  documentIds?: string[];
+  actualSyncedDocumentIds?: string[];
+  smartlyUpload?: SmartlyUploadConfig;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,8 +67,16 @@ const syncSchema = new Schema<Sync>(
       type: Number,
       default: 0,
     },
-    documentIds: [String], // Initially selected document IDs
-    actualSyncedDocumentIds: [String], // All document IDs that were actually synced
+    documentIds: [String],
+    actualSyncedDocumentIds: [String],
+    smartlyUpload: {
+      type: {
+        destinationPrefix: String,
+        libraryId: String,
+        apiToken: String,
+      },
+      default: null,
+    },
   },
   {
     timestamps: true,

@@ -29,7 +29,7 @@ const MAX_RETRIES = 3;
 const RETRY_DELAYS_MS = [1000, 2000, 4000];
 
 async function performSync(eventData: SyncEventData): Promise<void> {
-  const { syncId, connectionId, userId, token, credentials, documentIds } = eventData;
+  const { syncId, connectionId, userId, token, credentials, documentIds, smartlyUpload } = eventData;
 
   if (!documentIds || documentIds.length === 0) {
     throw new Error("No document IDs provided for sync");
@@ -98,6 +98,7 @@ async function performSync(eventData: SyncEventData): Promise<void> {
     connectionId,
     content: null,
     userId,
+    ...(smartlyUpload && doc.canDownload ? { smartlyUpload } : {}),
   }));
 
   if (docsToSave.length > 0) {

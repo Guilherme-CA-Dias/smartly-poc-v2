@@ -1,6 +1,12 @@
 import { DownloadStateType, DownloadState } from "@/types/download";
 import { Schema, model, models } from "mongoose";
 
+export interface SmartlyUploadConfig {
+  destinationPrefix: string;
+  libraryId: string;
+  apiToken: string;
+}
+
 export interface Document {
   _id: string;
   id: string;
@@ -16,6 +22,7 @@ export interface Document {
   content?: string;
   lastSyncedAt: string;
   storageKey?: string;
+  smartlyUpload?: SmartlyUploadConfig;
 
   downloadState?: DownloadStateType;
   downloadError?: string;
@@ -59,6 +66,14 @@ const documentSchema = new Schema<DocumentWithConnection>({
   },
   downloadError: {
     type: String,
+    default: null,
+  },
+  smartlyUpload: {
+    type: {
+      destinationPrefix: String,
+      libraryId: String,
+      apiToken: String,
+    },
     default: null,
   },
 });

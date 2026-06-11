@@ -33,6 +33,8 @@ export function IntegrationListItem({
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isFlowsOpen, setIsFlowsOpen] = useState(false);
   const [isSmartlyOpen, setIsSmartlyOpen] = useState(false);
+  const [isSmartlyDestinationOpen, setIsSmartlyDestinationOpen] = useState(false);
+  const [pendingDocumentIds, setPendingDocumentIds] = useState<string[]>([]);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
 
@@ -82,7 +84,13 @@ export function IntegrationListItem({
     }
   };
 
-  const handleSync = async (selectedDocumentIds: string[]) => {
+  const handleDocumentsPicked = (selectedDocumentIds: string[]) => {
+    setPendingDocumentIds(selectedDocumentIds);
+    setIsPickerOpen(false);
+    setIsSmartlyDestinationOpen(true);
+  };
+
+  const handleSync = async (selectedDocumentIds: string[], smartlyDestinationPrefix?: string) => {
     if (!integration.connection?.id) {
       return;
     }
@@ -103,6 +111,7 @@ export function IntegrationListItem({
             integrationLogo: integration.logoUri,
             documentIds:
               selectedDocumentIds.length > 0 ? selectedDocumentIds : undefined,
+            smartlyDestinationPrefix,
           }),
         }
       );
@@ -139,12 +148,23 @@ export function IntegrationListItem({
       {isPickerOpen && (
         <DocumentPicker
           integration={integration}
-          onDone={handleSync}
+          onDone={handleDocumentsPicked}
           onClose={() => setIsPickerOpen(false)}
           open={isPickerOpen}
           onOpenChange={setIsPickerOpen}
         />
       )}
+
+      <SmartlyFilesPicker
+        integration={integration}
+        open={isSmartlyDestinationOpen}
+        onOpenChange={setIsSmartlyDestinationOpen}
+        mode="select-folder"
+        onSelectFolder={(prefix) => {
+          setIsSmartlyDestinationOpen(false);
+          handleSync(pendingDocumentIds, prefix);
+        }}
+      />
 
       <SyncHistoryModal
         integrationId={integration.connection?.id || ""}

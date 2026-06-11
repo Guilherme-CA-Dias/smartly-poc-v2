@@ -14,6 +14,12 @@ export type SyncRouteResponse =
   | SyncRouteSuccessResponse
   | SyncRouteErrorResponse;
 
+export interface SmartlyUploadConfig {
+  destinationPrefix: string;
+  libraryId: string;
+  apiToken: string;
+}
+
 export interface SyncEventData {
   syncId: string;
   connectionId: string;
@@ -24,6 +30,7 @@ export interface SyncEventData {
   integrationId?: string;
   integrationName?: string;
   integrationLogo?: string;
+  smartlyUpload?: SmartlyUploadConfig;
 }
 
 export interface SyncRequestBody {
@@ -32,4 +39,5 @@ export interface SyncRequestBody {
   integrationName: string;
   integrationLogo?: string;
   documentIds?: string[];
+  smartlyDestinationPrefix?: string;
 }

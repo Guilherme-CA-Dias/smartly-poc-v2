@@ -6,6 +6,35 @@ import { NextResponse } from "next/server";
 import { inngest } from "@/inngest/client";
 import { DownloadState } from "@/types/download";
 
+const SMARTLY_FILESTORE = "https://app.smartly.io/filestore/public";
+
+async function pushToSmartly(
+  downloadURI: string,
+  title: string,
+  destinationPrefix: string,
+  libraryId: string,
+  apiToken: string
+): Promise<void> {
+  const binaryRes = await fetch(downloadURI);
+  if (!binaryRes.ok) throw new Error(`Failed to fetch binary: ${binaryRes.status}`);
+  const binary = await binaryRes.arrayBuffer();
+
+  const prefix = destinationPrefix.replace(/\/$/, "");
+  const objectKey = prefix ? `${prefix}/${title}` : title;
+  const url = `${SMARTLY_FILESTORE}/${libraryId}/${objectKey}`;
+
+  const putRes = await fetch(url, {
+    method: "PUT",
+    headers: { "x-api-token": apiToken, "Content-Type": "application/octet-stream" },
+    body: binary,
+  });
+
+  if (!putRes.ok) {
+    const msg = await putRes.text();
+    throw new Error(`Smartly PUT failed (${putRes.status}): ${msg}`);
+  }
+}
+
 const onDownloadCompleteWebhookPayloadSchema = z.object({
   downloadURI: z
     .union([
@@ -85,6 +114,12 @@ export async function POST(request: Request) {
           currentStorageKey: document.storageKey,
         },
       });
+
+      if (document.smartlyUpload) {
+        const { destinationPrefix, libraryId, apiToken } = document.smartlyUpload;
+        pushToSmartly(downloadURI, document.title, destinationPrefix, libraryId, apiToken)
+          .catch((err) => console.error(`Smartly upload failed for ${documentId}:`, err));
+      }
     } else {
       await DocumentModel.findOneAndUpdate(
         { connectionId, id: documentId },

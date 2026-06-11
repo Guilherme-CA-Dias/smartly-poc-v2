@@ -7,6 +7,7 @@ import { getAuthHeaders } from "@/app/auth-provider";
 const MEMBRANE_FILES_URL = "https://api.getmembrane.com/files";
 
 export interface SmartlyItem {
+  id: string;
   key: string;
   name: string;
   isFolder: boolean;
@@ -14,13 +15,21 @@ export interface SmartlyItem {
   lastModified?: string;
 }
 
-function parseXml(raw: string): { files: SmartlyItem[]; folders: SmartlyItem[] } {
+interface ParsedPage {
+  files: SmartlyItem[];
+  folders: SmartlyItem[];
+  isTruncated: boolean;
+  nextContinuationToken: string | undefined;
+}
+
+function parseXml(raw: string): ParsedPage {
   const parser = new DOMParser();
   const doc = parser.parseFromString(raw, "text/xml");
 
   const files: SmartlyItem[] = Array.from(doc.querySelectorAll("Contents")).map((el) => {
     const key = el.querySelector("Key")?.textContent ?? "";
     return {
+      id: el.querySelector("Id")?.textContent ?? key,
       key,
       name: key.split("/").filter(Boolean).pop() ?? key,
       isFolder: false,
@@ -34,13 +43,19 @@ function parseXml(raw: string): { files: SmartlyItem[]; folders: SmartlyItem[] }
   ).map((el) => {
     const prefix = el.textContent ?? "";
     return {
+      id: prefix,
       key: prefix,
       name: prefix.split("/").filter(Boolean).pop() ?? prefix,
       isFolder: true,
     };
   });
 
-  return { files, folders };
+  const isTruncated =
+    doc.querySelector("IsTruncated")?.textContent?.toLowerCase() === "true";
+  const nextContinuationToken =
+    doc.querySelector("NextContinuationToken")?.textContent ?? undefined;
+
+  return { files, folders, isTruncated, nextContinuationToken };
 }
 
 function extractXml(output: unknown): string {
@@ -49,6 +64,10 @@ function extractXml(output: unknown): string {
     const o = output as Record<string, unknown>;
     if (typeof o.body === "string") return o.body;
     if (typeof o.content === "string") return o.content;
+    if (o.response && typeof o.response === "object") {
+      const r = o.response as Record<string, unknown>;
+      if (typeof r.data === "string") return r.data;
+    }
   }
   return "";
 }
@@ -62,25 +81,36 @@ export function useSmartlyFiles(connectionId: string | undefined) {
   const [sending, setSending] = useState(false);
 
   const listFiles = useCallback(
-    async (prefix?: string, continuationToken?: string) => {
+    async (prefix?: string) => {
       if (!connectionId) return;
       setLoading(true);
       setError(null);
       try {
-        const result = await integrationApp
-          .connection(connectionId)
-          .action("list-smartly-files")
-          .run({
-            ...(prefix && { prefix }),
-            delimiter: "/",
-            maxKeys: 500,
-            ...(continuationToken && { continuationToken }),
-          });
+        const allFiles: SmartlyItem[] = [];
+        const allFolders: SmartlyItem[] = [];
+        let token: string | undefined;
 
-        const xml = extractXml((result as { output: unknown }).output);
-        const parsed = parseXml(xml);
-        setFiles(parsed.files);
-        setFolders(parsed.folders);
+        do {
+          const result = await integrationApp
+            .connection(connectionId)
+            .action("list-smartly-files")
+            .run({
+              ...(prefix && { prefix }),
+              delimiter: "/",
+              maxKeys: "500",
+              ...(token && { continuationToken: token }),
+            });
+
+          const xml = extractXml((result as { output: unknown }).output);
+          const page = parseXml(xml);
+
+          allFiles.push(...page.files);
+          allFolders.push(...page.folders);
+          token = page.isTruncated ? page.nextContinuationToken : undefined;
+        } while (token);
+
+        setFiles(Array.from(new Map(allFiles.map((f) => [f.id, f])).values()));
+        setFolders(Array.from(new Map(allFolders.map((f) => [f.id, f])).values()));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to list files");
       } finally {

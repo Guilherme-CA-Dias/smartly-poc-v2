@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Integration } from "@integration-app/sdk";
 import {
@@ -49,14 +50,24 @@ export function SmartlyFilesPicker({
 
   const [breadcrumbs, setBreadcrumbs] = useState<BreadcrumbItem[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [destinationPath, setDestinationPath] = useState("");
 
   useEffect(() => {
     if (open) {
       setBreadcrumbs([]);
       setSelected(new Set());
+      setDestinationPath("");
       listFiles();
     }
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep destination path in sync when navigating folders
+  useEffect(() => {
+    if (mode === "select-folder") {
+      const prefix = breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].prefix : "";
+      setDestinationPath(prefix);
+    }
+  }, [breadcrumbs, mode]);
 
   const navigateToFolder = (item: SmartlyItem) => {
     setBreadcrumbs((prev) => [...prev, { prefix: item.key, name: item.name }]);
@@ -227,21 +238,23 @@ export function SmartlyFilesPicker({
         <DialogFooter className="!flex !flex-row !items-center !justify-between">
           {mode === "select-folder" ? (
             <>
-              <div className="text-sm text-gray-500 truncate max-w-[260px]">
-                {breadcrumbs.length === 0
-                  ? "Root folder"
-                  : breadcrumbs[breadcrumbs.length - 1].name}
+              <div className="flex items-center gap-2 flex-1">
+                <span className="text-sm text-gray-500 whitespace-nowrap">Path:</span>
+                <Input
+                  value={destinationPath}
+                  onChange={(e) => setDestinationPath(e.target.value)}
+                  placeholder="e.g. campaign-assets/summer/"
+                  className="h-8 text-sm font-mono"
+                />
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <div className="flex gap-2 ml-2 flex-shrink-0">
+                <Button variant="outline" size="sm" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>
                 <Button
+                  size="sm"
                   onClick={() => {
-                    const prefix = breadcrumbs.length > 0
-                      ? breadcrumbs[breadcrumbs.length - 1].prefix
-                      : "";
-                    onSelectFolder?.(prefix);
+                    onSelectFolder?.(destinationPath);
                     onOpenChange(false);
                   }}
                 >

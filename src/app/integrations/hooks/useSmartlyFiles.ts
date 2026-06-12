@@ -2,9 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useIntegrationApp } from "@integration-app/react";
-import { getAuthHeaders } from "@/app/auth-provider";
-
-const MEMBRANE_FILES_URL = "https://api.getmembrane.com/files";
 
 export interface SmartlyItem {
   id: string;
@@ -125,41 +122,11 @@ export function useSmartlyFiles(connectionId: string | undefined) {
       if (!connectionId) return;
       setSending(true);
       try {
-        // Fetch integration token once for all uploads
-        const tokenRes = await fetch("/api/integration-token", {
-          headers: getAuthHeaders(),
-        });
-        if (!tokenRes.ok) throw new Error("Failed to get integration token");
-        const { token } = await tokenRes.json();
-
         for (const assetPath of keys) {
-          // 1. Get binary from Smartly
-          const getResult = await integrationApp
-            .connection(connectionId)
-            .action("get-smartly-files")
-            .run({ assetPath });
-
-          const binary =
-            (getResult as { output: Record<string, unknown> }).output?.body ??
-            (getResult as { output: unknown }).output;
-
-          // 2. Upload to Membrane to get a stable download URL
-          const uploadRes = await fetch(MEMBRANE_FILES_URL, {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/octet-stream",
-            },
-            body: binary as BodyInit,
-          });
-          if (!uploadRes.ok) throw new Error(`Membrane upload failed for ${assetPath}`);
-          const { downloadUri } = await uploadRes.json();
-
-          // 3. Send the download URL to the integration
           await integrationApp
             .connection(connectionId)
             .action("send-files")
-            .run({ assetPath, downloadUrl: downloadUri });
+            .run({ assetPath });
         }
       } finally {
         setSending(false);
